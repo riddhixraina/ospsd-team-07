@@ -5,7 +5,7 @@
 * **Saakshi Narayan** (`sn4230`)
 * **Mingjian Li** (`l8347`)
 * **Joshua Leeman** (`jl17087`)
-* * **Riddhi Prasad** (`rrp4822`)
+* **Riddhi Prasad** (`rrp4822`)
 
 ## Project Description
 Welcome to the repository for Team 7! This project focuses on [Insert 1-2 sentences about what your application does, e.g., "developing a web application to track student expenses using Python and React"]. Our goal is to collaborate effectively to deliver a robust and scalable solution.
@@ -15,5 +15,5 @@ Welcome to the repository for Team 7! This project focuses on [Insert 1-2 senten
    ```bash
    git clone [https://github.com/](https://github.com/)[your-username]/[repo-name].git
    
-## License
-[MIT License] - see the [LICENSE](LICENSE) file for details.
+## LICENSE
+[MIT LICENSE] - see the [LICENSE](LICENSE) file for details.
