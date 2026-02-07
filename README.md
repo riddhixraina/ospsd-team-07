@@ -3,7 +3,7 @@
 ## Team Members
 * **Somaditya Singh** (`ss20288`)
 * **Saakshi Narayan** (`sn4230`)
-* **Mingjian Li** (`l8347`)
+* **Mingjian Li** (`ml8347`)
 * **Joshua Leeman** (`jl17087`)
 * **Riddhi Prasad** (`rrp4822`)
 
