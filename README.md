@@ -14,3 +14,6 @@ Welcome to the repository for Team 7! This project focuses on [Insert 1-2 senten
 1. **Clone the repository:**
    ```bash
    git clone [https://github.com/](https://github.com/)[your-username]/[repo-name].git
+   
+## License
+[MIT License] - see the [LICENSE](LICENSE) file for details.
