@@ -5,6 +5,10 @@
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
 
+## Related issues
+- Closes # 
+- Relates to #
+
 ## Testing Plan
 - [ ] Unit Tests
 - [ ] Manual Testing (describe steps below)
@@ -16,3 +20,5 @@
 - [ ] I have made corresponding changes to the documentation
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
+
+## Notes for reviewers

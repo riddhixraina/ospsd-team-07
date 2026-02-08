@@ -13,6 +13,15 @@ A clear and concise description of what the problem is. Ex. I'm always frustrate
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.
 
+**Describe the value this feature would provide**
+A clear and concise description of the value the user/customer will derive from this feature
+
+**Describe a high overview implementation of this feature**
+A clear and concise description of how to implement this feature
+
+**Describe the priority of this feature**
+How important is it to implement this feature
+
 **Describe alternatives you've considered**
 A clear and concise description of any alternative solutions or features you've considered.
 

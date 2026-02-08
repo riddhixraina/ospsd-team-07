@@ -10,6 +10,12 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+**Relevant error messages**
+Paste any screenshot or error messages here
+
+**Impact of bug**
+A clear and concise description of the severity and frequency of the bug.
+
 **To Reproduce**
 Steps to reproduce the behavior:
 1. Go to '...'
@@ -36,3 +42,9 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+**Debugging progress**
+Include any progress found here
+
+**Proposed solutions**
+Include any proposed solutions you have
