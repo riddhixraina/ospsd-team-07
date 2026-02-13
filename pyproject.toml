@@ -1,0 +1,83 @@
+[project]
+name = "ospsd-team-07"
+version = "0.1.0"
+description = "OSPSD Team 07 - Issue Tracker Client"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.6.0",
+    "mkdocstrings-python>=1.16.0",
+    "mypy>=1.15.0",
+    "pymdown-extensions>=10.14.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.0",
+]
+
+[tool.uv.workspace]
+members = ["components/*"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "D203", # `one-blank-line-before-class` (D203) and `no-blank-line-before-class` (D211) are incompatible. Ignoring D203.
+  "D213", # `multi-line-summary-first-line` (D212) and `multi-line-summary-second-line` (D213) are incompatible. Ignoring D213.
+  "COM812", # `missing-trailing-comma` conflicts with the ruff formatter which handles trailing commas automatically.
+]
+per-file-ignores = { "**/tests/**/*.py" = [
+  "S101",    # Use of `assert` — standard in pytest tests
+  "PLR2004", # Magic value comparisons — common in test assertions
+  "D100",    # Missing module docstring — test modules are self-documenting
+  "D103",    # Missing function docstring — test function names describe intent
+  "ANN401",  # Dynamically typed expressions (Any) — needed for mocking
+  "ARG001",  # Unused function argument — pytest fixtures may appear unused
+  "ARG002",  # Unused method argument — same as above
+  "SLF001",  # Private member access — tests may need to verify internal state
+  "TRY300",  # Return inside try block — common pattern in test error handling
+  "BLE001",  # Blind exception catch — tests may catch broad exceptions intentionally
+  "E501",    # Line too long — test assertions can be verbose
+  "S105",    # Hardcoded password in variable — tests use fake credentials
+  "S106",    # Hardcoded password in function arg — same as above
+  "INP001",  # Missing __init__.py — test dirs must not have __init__.py per hw1
+  "PLC0415", # Import not at top of file — tests may import inside functions
+] }
+
+[tool.mypy]
+strict = true
+explicit_package_bases = true  # Required for src layout
+mypy_path = ["components/issue_tracker_client_api/src", "components/issue_tracker_client_impl/src"]
+ignore_missing_imports = false
+show_error_codes = true
+
+[tool.pytest.ini_options]
+pythonpath = [
+    ".",
+    "components",
+]
+testpaths = ["tests", "components/*/tests"]
+addopts = ["--cov", "--cov-report=term-missing", "--import-mode=importlib"]
+markers = [
+    "unit: marks tests as unit tests (fast, isolated)",
+    "integration: marks tests as integration tests (medium speed, real dependencies)",
+    "e2e: marks tests as end-to-end tests (slow, full system)",
+]
+
+[tool.coverage.run]
+source = ["components"]
+omit = ["*/tests/*", "*/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 85  # Justification: A high threshold ensures most code is tested.
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
