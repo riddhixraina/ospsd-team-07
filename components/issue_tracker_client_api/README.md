@@ -11,7 +11,7 @@
 ## Architecture
 
 ### Component Design
-The package exposes one abstract base class focused on issue tracking operations - CRUD, assign priority, assign leader, etc. It depends only on the ```Issue``` abstraction.
+The package exposes one abstract base class focused on issue tracking operations - CRUD, assign priority, assign leader, assign status, etc. It depends only on the ```Issue``` abstraction.
 
 ### API Integration
 ```
@@ -41,7 +41,10 @@ class Client(ABC):
 #### Methods
  - ```get_issue(issue_id: str) -> Issue```: Return a single issue
  - ```delete_issue(issue_id: str) -> bool```: Remove the issue from the board
- - ```assign_priority(issue_id: str) -> bool```: Assign priority label to issue
+ - ```assign_priority(issue_id: str, priority: str) -> bool```: Assign priority label to issue
+
+ - ```assign_leader(issue_id: str, leader: str) -> bool```: Assign leader to issue
+ - ```assign_status(issue_id: str, status: str) -> bool```: Assign status to issue
  - ```get_issues(max_issues: int = 10) -> Iterator[Issue]```: Yield issues lazily
 
  ### Factory Function
