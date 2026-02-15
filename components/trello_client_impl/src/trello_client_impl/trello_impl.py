@@ -37,13 +37,17 @@ class TrelloCard(Issue):
         self,
         *,
         id: str,
-        dueComplete: bool,
+        title: str = "",
+        isComplete: bool = False,
+        dueComplete: bool = False,
         desc: str | None = None,
         due: str | None = None,
         idBoard: str | None = None,
         idList: str | None = None,
     ) -> None:
         self._id = id
+        self._title = title
+        self._isComplete = isComplete or dueComplete
         self._dueComplete = dueComplete
         self._desc = desc
         self._due = due
@@ -53,6 +57,14 @@ class TrelloCard(Issue):
     @property
     def id(self) -> str:
         return self._id
+
+    @property
+    def title(self) -> str:
+        return self._title
+
+    @property
+    def isComplete(self) -> bool:
+        return self._isComplete
 
     @property
     def dueComplete(self) -> bool:
@@ -68,11 +80,11 @@ class TrelloCard(Issue):
 
     @property
     def id_board(self) -> str | None:
-        return self._id_board
+        return self._idBoard
 
     @property
     def id_list(self) -> str | None:
-        return self._id_list
+        return self._idList
 
     @classmethod
     def from_api(cls, card: dict) -> "TrelloCard":
@@ -80,7 +92,7 @@ class TrelloCard(Issue):
         return cls(
             id=card["id"],
             title=card.get("name", ""),
-            is_complete=bool(card.get("dueComplete", False)),
+            isComplete=bool(card.get("dueComplete", False)),
             desc=card.get("desc") or None,
             due=card.get("due"),
             idBoard=card.get("idBoard"),
@@ -146,10 +158,7 @@ class TrelloMember(Member):
     def from_api(cls, member: dict) -> "TrelloMember":
         return cls(
             id=member["id"],
-            full_name=member.get("fullName"),
             username=member.get("username"),
-            initials=member.get("initials"),
-            avatar_url=member.get("avatarUrl"),
             confirmed=member.get("confirmed") if "confirmed" in member else None,
         )
 

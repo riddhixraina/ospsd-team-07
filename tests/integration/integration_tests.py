@@ -1,0 +1,187 @@
+"""Integration tests for the issue tracker components."""
+
+import pytest
+from unittest.mock import MagicMock, patch
+
+from issue_tracker_client_api import Client, Issue, Board, Member
+from trello_client_impl.trello_impl import (
+    TrelloClient,
+    TrelloCard,
+    TrelloBoard,
+    TrelloMember,
+    get_client_impl,
+)
+
+
+@pytest.mark.integration
+class TestClientInterfaceImplementation:
+    """Test that TrelloClient properly implements the Client interface."""
+
+    def test_trello_client_is_instance_of_client(self, integration_env_setup, mocker):
+        """Test that TrelloClient is an instance of Client."""
+        client = TrelloClient()
+        assert isinstance(client, Client)
+
+    def test_trello_client_implements_all_methods(self, integration_env_setup, mocker):
+        """Test that TrelloClient implements all required Client methods."""
+        client = TrelloClient()
+        required_methods = [
+            "get_issue",
+            "delete_issue",
+            "mark_complete",
+            "get_issues",
+            "get_board",
+            "get_members_on_card",
+        ]
+        for method in required_methods:
+            assert hasattr(client, method)
+            assert callable(getattr(client, method))
+
+
+@pytest.mark.integration
+class TestTrelloCardInterfaceImplementation:
+    """Test that TrelloCard properly implements the Issue interface."""
+
+    def test_trello_card_is_instance_of_issue(self):
+        """Test that TrelloCard is an instance of Issue."""
+        card = TrelloCard(id="test_id", title="Test", isComplete=False)
+        assert isinstance(card, Issue)
+
+    def test_trello_card_implements_issue_interface(self):
+        """Test that TrelloCard implements all Issue properties."""
+        card = TrelloCard(id="test_id", title="Test", isComplete=False)
+        assert hasattr(card, "id")
+        assert hasattr(card, "dueComplete")
+
+
+@pytest.mark.integration
+class TestTrelloBoardInterfaceImplementation:
+    """Test that TrelloBoard properly implements the Board interface."""
+
+    def test_trello_board_is_instance_of_board(self):
+        """Test that TrelloBoard is an instance of Board."""
+        board = TrelloBoard(id="board_id", name="Test Board")
+        assert isinstance(board, Board)
+
+    def test_trello_board_implements_board_interface(self):
+        """Test that TrelloBoard implements all Board properties."""
+        board = TrelloBoard(id="board_id", name="Test Board")
+        assert hasattr(board, "id")
+        assert hasattr(board, "name")
+        assert board.id == "board_id"
+        assert board.name == "Test Board"
+
+
+@pytest.mark.integration
+class TestTrelloMemberInterfaceImplementation:
+    """Test that TrelloMember properly implements the Member interface."""
+
+    def test_trello_member_is_instance_of_member(self):
+        """Test that TrelloMember is an instance of Member."""
+        member = TrelloMember(id="member_id", username="testuser")
+        assert isinstance(member, Member)
+
+    def test_trello_member_implements_member_interface(self):
+        """Test that TrelloMember implements all Member properties."""
+        member = TrelloMember(id="member_id", username="testuser", confirmed=True)
+        assert hasattr(member, "id")
+        assert hasattr(member, "username")
+        assert hasattr(member, "confirmed")
+
+
+@pytest.mark.integration
+class TestClientWorkflows:
+    """Test multi-step client workflows with mocked requests."""
+
+    def test_get_and_mark_complete_workflow(self, integration_env_setup, mocker, mock_card_response):
+        """Test workflow: get issue then mark it complete."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = mock_card_response
+        mock_request = mocker.patch(
+            "trello_client_impl.trello_impl.requests.request",
+            return_value=mock_response,
+        )
+
+        client = TrelloClient()
+        client.api_key = "test_key"
+        client._token = "test_token"
+
+        # Get the issue
+        issue = client.get_issue("card_id")
+        assert issue is not None
+
+        # Mark it complete
+        result = client.mark_complete("card_id")
+        assert result is True
+        # Verify requests were called
+        assert mock_request.call_count >= 1
+
+    def test_get_board_and_cards_workflow(self, integration_env_setup, mocker, mock_board_response, mock_card_response):
+        """Test workflow: get board then get its cards."""
+        mock_response = MagicMock()
+        mock_response.json.side_effect = [
+            mock_board_response,
+            [mock_card_response]
+        ]
+        mocker.patch(
+            "trello_client_impl.trello_impl.requests.request",
+            return_value=mock_response,
+        )
+
+        client = TrelloClient()
+        client.api_key = "test_key"
+        client._token = "test_token"
+        client._default_board_id = "board_id"
+
+        # Get the board
+        board = client.get_board("board_id")
+        assert board is not None
+        assert isinstance(board, Board)
+
+        # Get issues on the board
+        issues = list(client.get_issues(max_issues=10))
+        assert isinstance(issues, list)
+
+    def test_get_card_members_workflow(self, integration_env_setup, mocker, mock_member_response):
+        """Test workflow: get card and its members."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = [mock_member_response]
+        mocker.patch(
+            "trello_client_impl.trello_impl.requests.request",
+            return_value=mock_response,
+        )
+
+        client = TrelloClient()
+        client.api_key = "test_key"
+        client._token = "test_token"
+
+        # Get members on card
+        members = client.get_members_on_card("card_id")
+        assert isinstance(members, list)
+        assert len(members) > 0
+        assert isinstance(members[0], Member)
+
+
+@pytest.mark.integration
+class TestFactoryFunctions:
+    """Test factory functions work correctly."""
+
+    def test_get_client_impl_returns_proper_client(self, integration_env_setup, mocker):
+        """Test get_client_impl returns a working Client instance."""
+        client = get_client_impl()
+        assert isinstance(client, Client)
+        assert isinstance(client, TrelloClient)
+
+    def test_client_from_factory_is_usable(self, integration_env_setup, mocker, mock_card_response):
+        """Test that client from factory can perform operations."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = mock_card_response
+        mocker.patch(
+            "trello_client_impl.trello_impl.requests.request",
+            return_value=mock_response,
+        )
+
+        client = get_client_impl()
+        # Perform an operation
+        issue = client.get_issue("test_id")
+        assert issue is not None
