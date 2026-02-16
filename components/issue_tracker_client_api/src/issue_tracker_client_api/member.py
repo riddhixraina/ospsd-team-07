@@ -19,7 +19,7 @@ class Member(ABC):
     @property
     @abstractmethod
     def username(self) -> str | None:
-        """Username (Trello: username)."""
+        """Return the username (Trello: username)."""
         raise NotImplementedError("Subclasses must implement username")
 
     @property
@@ -27,7 +27,8 @@ class Member(ABC):
     def confirmed(self) -> bool | None:
         """Whether the user has confirmed their email (Trello: confirmed)."""
         raise NotImplementedError("Subclasses must implement confirmed")
-    
+
+
 def get_member(member_id: str) -> Member:
     """Return a member by their ID."""
     raise NotImplementedError("Subclasses must implement get_member")

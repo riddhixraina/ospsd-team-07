@@ -9,9 +9,10 @@ from issue_tracker_client_api.member import Member
 
 __all__ = ["Client", "get_client"]
 
+
 class Client(ABC):
     """Abstract base class representing an issue tracker client for managing issues."""
-    
+
     @abstractmethod
     def get_issue(self, issue_id: str) -> Issue:
         """Return a single issue/card by its ID (Trello: GET /cards/{id})."""
@@ -29,7 +30,10 @@ class Client(ABC):
 
     @abstractmethod
     def get_issues(self, max_issues: int = 10) -> Iterator[Issue]:
-        """Return an iterator of issues, up to max_issues (Trello: GET /boards/{id}/cards)."""
+        """Return an iterator of issues, up to max_issues.
+
+        Trello: GET /boards/{id}/cards.
+        """
         raise NotImplementedError("Subclasses must implement get_issues")
 
     @abstractmethod

@@ -1,8 +1,8 @@
 """Unit tests for the Member abstract class."""
 
-import pytest
 from abc import ABC
 
+import pytest
 from issue_tracker_client_api.member import Member, get_member
 
 

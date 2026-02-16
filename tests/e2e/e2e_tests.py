@@ -14,7 +14,6 @@ These tests are skipped if credentials are not available.
 """
 
 import pytest
-
 from trello_client_impl.trello_impl import TrelloClient
 
 
@@ -40,7 +39,7 @@ class TestE2EClientInitialization:
 @pytest.mark.e2e
 class TestE2EClientOperations:
     """Test real client API operations.
-    
+
     Note: These tests require a valid Trello board and cards to exist.
     Adjust board_id and card_id to match your test setup.
     """
@@ -98,7 +97,7 @@ class TestE2EErrorHandling:
     def test_invalid_board_id_handling(self, e2e_skip_if_no_credentials):
         """Test handling of invalid board IDs."""
         client = TrelloClient()
-        
+
         try:
             board = client.get_board("invalid_board_id_12345")
             # If we get here, the API accepted it (unlikely)
@@ -111,7 +110,7 @@ class TestE2EErrorHandling:
     def test_invalid_card_id_handling(self, e2e_skip_if_no_credentials):
         """Test handling of invalid card IDs."""
         client = TrelloClient()
-        
+
         try:
             card = client.get_issue("invalid_card_id_12345")
             # If we get here, the API accepted it (unlikely)
@@ -150,9 +149,9 @@ class TestE2EAuthenticationFailure:
     def test_invalid_token_handling(self, mocker):
         """Test that invalid token is handled gracefully."""
         mocker.patch.dict("os.environ", {"TRELLO_TOKEN": "", "TRELLO_API_KEY": ""})
-        
+
         client = TrelloClient()
-        
+
         # Token should raise error if accessed without proper setup
         with pytest.raises(ValueError, match="token not set"):
             _ = client.token

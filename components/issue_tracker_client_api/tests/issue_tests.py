@@ -1,8 +1,8 @@
 """Unit tests for the Issue abstract class."""
 
-import pytest
 from abc import ABC
 
+import pytest
 from issue_tracker_client_api.issue import Issue, get_issue
 
 

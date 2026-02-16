@@ -1,7 +1,6 @@
 """Conftest for trello_client_impl tests."""
 
 import pytest
-from unittest.mock import MagicMock, patch
 
 
 @pytest.fixture

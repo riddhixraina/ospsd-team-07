@@ -6,4 +6,16 @@ from issue_tracker_client_api.client import Client, get_client
 from issue_tracker_client_api.issue import Issue, get_issue
 from issue_tracker_client_api.member import Member, get_member
 
-__all__ = ["Board", "Client", "Issue", "Member", "get_client", "get_issue", "board", "issue", "member"]
+__all__ = [
+    "Board",
+    "Client",
+    "Issue",
+    "Member",
+    "board",
+    "get_board",
+    "get_client",
+    "get_issue",
+    "get_member",
+    "issue",
+    "member",
+]

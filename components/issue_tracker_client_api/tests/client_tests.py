@@ -1,10 +1,10 @@
 """Unit tests for the Client abstract class."""
 
-import pytest
 from abc import ABC
 
+import pytest
+from issue_tracker_client_api import Board, Issue, Member
 from issue_tracker_client_api.client import Client, get_client
-from issue_tracker_client_api import Issue, Board, Member
 
 
 @pytest.mark.unit

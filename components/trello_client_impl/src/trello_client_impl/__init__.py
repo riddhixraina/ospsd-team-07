@@ -20,4 +20,3 @@ __all__ = [
 
 # Dependency Injection happens at import time
 register()
-    

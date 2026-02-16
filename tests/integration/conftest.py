@@ -1,7 +1,8 @@
 """Conftest for integration tests."""
 
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import MagicMock, patch
 
 
 @pytest.fixture
@@ -26,8 +27,6 @@ def integration_env_setup(mocker):
 @pytest.fixture
 def mock_client_implementation():
     """Provide a mock client implementation for integration tests."""
-    from unittest.mock import MagicMock
-
     mock_client = MagicMock()
     mock_client.get_issue = MagicMock()
     mock_client.delete_issue = MagicMock(return_value=True)

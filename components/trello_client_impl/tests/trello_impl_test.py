@@ -1,15 +1,13 @@
 """Unit tests for the Trello client implementation."""
 
-import os
+from unittest.mock import MagicMock
 
 import pytest
-from unittest.mock import MagicMock, patch
-
 from trello_client_impl.trello_impl import (
-    TrelloCard,
     TrelloBoard,
-    TrelloMember,
+    TrelloCard,
     TrelloClient,
+    TrelloMember,
     get_client_impl,
     register,
 )
@@ -93,9 +91,7 @@ class TestTrelloMember:
 
     def test_trello_member_initialization(self):
         """Test TrelloMember can be initialized."""
-        member = TrelloMember(
-            id="member_123", username="testuser", confirmed=True
-        )
+        member = TrelloMember(id="member_123", username="testuser", confirmed=True)
         assert member.id == "member_123"
         assert member.username == "testuser"
         assert member.confirmed is True
@@ -198,7 +194,9 @@ class TestTrelloClient:
         result = client.mark_complete("card_id")
         assert result is True
 
-    def test_trello_client_get_board(self, client_with_env, mocker, mock_board_response):
+    def test_trello_client_get_board(
+        self, client_with_env, mocker, mock_board_response
+    ):
         """Test TrelloClient.get_board with mocked API call."""
         mock_response = MagicMock()
         mock_response.json.return_value = mock_board_response
@@ -232,7 +230,9 @@ class TestTrelloClient:
         members = client.get_members_on_card("card_id")
         assert isinstance(members, list)
 
-    def test_trello_client_get_issues(self, client_with_env, mocker, mock_card_response):
+    def test_trello_client_get_issues(
+        self, client_with_env, mocker, mock_card_response
+    ):
         """Test TrelloClient.get_issues returns an iterator."""
         mock_response = MagicMock()
         mock_response.json.return_value = [mock_card_response]
