@@ -19,7 +19,13 @@ theme:
     - content.code.copy
 
 nav:
+  - "Overview": "index.md"
+  - "Architecture": "architecture.md"
+  - "API Reference":
+    - "Issue Tracker Client API": "api/issue_tracker_client_api.md"
+    - "Trello Client Implementation": "api/trello_client_impl.md"
   - "Code Quality": "code-quality.md"
+  - "CI/CD": "ci-cd.md"
 
 markdown_extensions:
   - pymdownx.highlight:

@@ -81,7 +81,6 @@ jobs:
               --cov=components \
               --cov-report=term-missing \
               --cov-report=html:htmlcov \
-              --cov-config=.coveragerc \
               -v
 
       - store_test_results:
