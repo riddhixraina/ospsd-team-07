@@ -83,14 +83,15 @@ jobs:
               --cov-report=html:htmlcov \
               --cov-config=.coveragerc \
               -v
-          when: always
 
       - store_test_results:
           path: test-results
+          when: always
 
       - store_artifacts:
           path: htmlcov
           destination: coverage-report
+          when: always
 
 workflows:
   version: 2
