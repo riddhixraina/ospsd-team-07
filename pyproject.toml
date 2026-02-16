@@ -99,18 +99,8 @@ mypy_path = ["components/issue_tracker_client_api/src", "components/trello_clien
 ignore_missing_imports = false
 show_error_codes = true
 
-[tool.pytest.ini_options]
-pythonpath = [
-    ".",
-    "components",
-]
-testpaths = ["tests", "components/*/tests"]
-addopts = ["--cov", "--cov-report=term-missing", "--import-mode=importlib"]
-markers = [
-    "unit: marks tests as unit tests (fast, isolated)",
-    "integration: marks tests as integration tests (medium speed, real dependencies)",
-    "e2e: marks tests as end-to-end tests (slow, full system)",
-]
+# Pytest config: pytest.ini is the single source of truth (takes precedence over pyproject.toml).
+# Do not duplicate [tool.pytest.ini_options] here — it would be ignored and cause confusion.
 
 # Coverage config: .coveragerc is the single source of truth (used by pytest --cov-config).
 # Do not duplicate [tool.coverage.*] here — it would be ignored and cause confusion.

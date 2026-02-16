@@ -134,6 +134,7 @@ class TestE2EInterfaceCompliance:
             "mark_complete",
             "get_issues",
             "get_board",
+            "get_boards",
             "get_members_on_card",
         ]
 
