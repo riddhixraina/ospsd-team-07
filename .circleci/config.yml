@@ -81,7 +81,15 @@ jobs:
               --cov=components \
               --cov-report=term-missing \
               --cov-report=html:htmlcov \
+              --cov-report=xml:coverage.xml \
               -v
+
+      - run:
+          name: Upload coverage to Codecov
+          command: |
+            curl -sSfL https://codecov.io/bash -o codecov.sh
+            bash codecov.sh -f coverage.xml -n circleci || echo "Codecov upload skipped (add repo at codecov.io to enable)"
+          when: always
 
       - store_test_results:
           path: test-results
