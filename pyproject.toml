@@ -102,5 +102,30 @@ show_error_codes = true
 # Pytest config: pytest.ini is the single source of truth (takes precedence over pyproject.toml).
 # Do not duplicate [tool.pytest.ini_options] here — it would be ignored and cause confusion.
 
-# Coverage config: .coveragerc is the single source of truth (used by pytest --cov-config).
-# Do not duplicate [tool.coverage.*] here — it would be ignored and cause confusion.
+[tool.coverage.run]
+branch = true
+source = ["components"]
+omit = [
+    "*/tests/*",
+    "*/__main__.py",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+fail_under = 85
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.*",
+    "@abstractmethod",
+    "@abc.abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
