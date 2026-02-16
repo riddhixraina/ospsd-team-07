@@ -1,0 +1,102 @@
+version: 2.1
+
+jobs:
+  lint:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "uv.lock" }}
+            - v1-deps-
+
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+
+      - run:
+          name: Install dependencies
+          command: |
+            uv sync --all-extras
+
+      - save_cache:
+          paths:
+            - .venv
+          key: v1-deps-{{ checksum "uv.lock" }}
+
+      - run:
+          name: Ruff (linting)
+          command: uv run ruff check .
+
+      - run:
+          name: Ruff (format check)
+          command: uv run ruff format --check .
+
+      - run:
+          name: Mypy (static type checking)
+          command: uv run mypy components/
+
+  test:
+    docker:
+      - image: cimg/python:3.12
+    environment:
+      TRELLO_API_KEY: $TRELLO_API_KEY
+      TRELLO_TOKEN: $TRELLO_TOKEN
+      TRELLO_BOARD_ID: $TRELLO_BOARD_ID
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "uv.lock" }}
+            - v1-deps-
+
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+
+      - run:
+          name: Install dependencies
+          command: |
+            uv sync --all-extras
+
+      - save_cache:
+          paths:
+            - .venv
+          key: v1-deps-{{ checksum "uv.lock" }}
+
+      - run:
+          name: Run tests (unit, integration, e2e)
+          command: |
+            mkdir -p test-results
+            uv run pytest \
+              -m "unit or integration or e2e" \
+              --junitxml=test-results/junit.xml \
+              --cov=components \
+              --cov-report=term-missing \
+              --cov-report=html:htmlcov \
+              --cov-config=.coveragerc \
+              -v
+          when: always
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: htmlcov
+          destination: coverage-report
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - lint
+      - test
