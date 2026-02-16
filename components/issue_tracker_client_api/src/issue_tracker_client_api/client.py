@@ -42,6 +42,14 @@ class Client(ABC):
         raise NotImplementedError("Subclasses must implement get_board")
 
     @abstractmethod
+    def get_boards(self) -> Iterator[Board]:
+        """Return an iterator of boards for the authenticated user.
+
+        Trello: GET /members/me/boards.
+        """
+        raise NotImplementedError("Subclasses must implement get_boards")
+
+    @abstractmethod
     def get_members_on_card(self, issue_id: str) -> list[Member]:
         """Return members assigned to the card (Trello: GET /cards/{id}/members)."""
         raise NotImplementedError("Subclasses must implement get_members_on_card")

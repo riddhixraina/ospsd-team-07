@@ -88,10 +88,12 @@ class TrelloCard(Issue):
     @classmethod
     def from_api(cls, card: dict[str, Any]) -> "TrelloCard":
         """Build TrelloCard from Trello API card object."""
+        due_complete = bool(card.get("dueComplete", False))
         return cls(
             id=card["id"],
             title=card.get("name", ""),
-            isComplete=bool(card.get("dueComplete", False)),
+            isComplete=due_complete,
+            dueComplete=due_complete,
             desc=card.get("desc") or None,
             due=card.get("due"),
             idBoard=card.get("idBoard"),

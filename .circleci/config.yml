@@ -44,10 +44,8 @@ jobs:
   test:
     docker:
       - image: cimg/python:3.12
-    environment:
-      TRELLO_API_KEY: $TRELLO_API_KEY
-      TRELLO_TOKEN: $TRELLO_TOKEN
-      TRELLO_BOARD_ID: $TRELLO_BOARD_ID
+    # Project-level env vars (TRELLO_API_KEY, TRELLO_TOKEN, TRELLO_BOARD_ID)
+    # are automatically available when set in CircleCI Project Settings
     steps:
       - checkout
 

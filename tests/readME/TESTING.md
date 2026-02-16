@@ -94,13 +94,13 @@ ospsd-team-07/
 
 Using `uv` (recommended):
 ```bash
-cd /Users/somaditya/Desktop/OSPSD/trello/ospsd-team-07
+cd /path/to/ospsd-team-07
 uv sync --all-extras
 ```
 
 Using `pip`:
 ```bash
-cd /Users/somaditya/Desktop/OSPSD/trello/ospsd-team-07
+cd /path/to/ospsd-team-07
 pip install -e .
 pip install -e components/issue_tracker_client_api[dev]
 pip install -e components/trello_client_impl[dev]

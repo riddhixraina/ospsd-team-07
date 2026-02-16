@@ -28,6 +28,7 @@ class TestClientAbstractClass:
             "mark_complete",
             "get_issues",
             "get_board",
+            "get_boards",
             "get_members_on_card",
         ]
         for method_name in required_methods:
@@ -53,6 +54,9 @@ class TestClientAbstractClass:
 
             def get_board(self, board_id: str) -> Board:
                 pass
+
+            def get_boards(self):
+                return iter([])
 
             def get_members_on_card(self, issue_id: str) -> list[Member]:
                 return []
