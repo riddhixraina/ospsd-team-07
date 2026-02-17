@@ -57,10 +57,7 @@ The testing framework includes:
 
 ```
 ospsd-team-07/
-├── conftest.py                           # Root fixtures and markers
-├── pytest.ini                            # Pytest configuration
-├── .coveragerc                           # Coverage configuration
-├── pyproject.toml                        # Project dependencies
+├── pyproject.toml                        # test dependencies
 │
 ├── components/
 │   ├── issue_tracker_client_api/

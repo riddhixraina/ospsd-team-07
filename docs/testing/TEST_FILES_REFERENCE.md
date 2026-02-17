@@ -234,23 +234,7 @@ pytest --cov=components --cov-report=term-missing
 
 ---
 
-## Test Execution Times
-
-| Category | Count | Typical Time |
-|----------|-------|--------------|
-| Unit Tests | 40+ | < 2 seconds |
-| Integration Tests | 20+ | 5-15 seconds |
-| E2E Tests | 10+ | 10-60 seconds (network dependent) |
-| **Total** | **70+** | **< 2 min (without E2E)** |
-
----
-
 ## Coverage
-
-- **Minimum Threshold:** 85%
-- **Excludes:** Test files, `__main__.py`, abstract methods
-- **Report Formats:** Terminal, HTML
-- **Configuration:** `.coveragerc`
 
 Generate coverage: `pytest --cov=components --cov-report=term-missing --cov-report=html`
 
@@ -266,4 +250,3 @@ Generate coverage: `pytest --cov=components --cov-report=term-missing --cov-repo
 
 ---
 
-End of Test Files Reference
