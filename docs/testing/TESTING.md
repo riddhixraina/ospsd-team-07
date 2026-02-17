@@ -12,7 +12,7 @@ and end-to-end (e2e) tests. All tests are configured with pytest and include cov
 
 The testing framework includes:
 
-### 1. **Unit Tests** (isolated, fast)
+### 1. **Unit Tests** (fast)
    - **Location**: `components/*/tests/`
    - **Marker**: `@pytest.mark.unit`
    - **Coverage**: Abstract interfaces and concrete implementations
@@ -28,7 +28,7 @@ The testing framework includes:
    - `trello_client_impl/tests/`:
      - `trello_impl_test.py` - TrelloClient, TrelloCard, TrelloBoard, TrelloMember implementations
 
-### 2. **Integration Tests** (medium speed, real dependencies)
+### 2. **Integration Tests** (real dependencies)
    - **Location**: `tests/integration/`
    - **Marker**: `@pytest.mark.integration`
    - **Purpose**: Test components working together
@@ -40,7 +40,7 @@ The testing framework includes:
    - Factory functions
    - Inter-component communications
 
-### 3. **End-to-End Tests** (slow, full system)
+### 3. **End-to-End Tests** (full system)
    - **Location**: `tests/e2e/`
    - **Marker**: `@pytest.mark.e2e`
    - **Purpose**: Test against actual Trello API
@@ -93,14 +93,6 @@ Using `uv` (recommended):
 ```bash
 cd /path/to/ospsd-team-07
 uv sync --all-extras
-```
-
-Using `pip`:
-```bash
-cd /path/to/ospsd-team-07
-pip install -e .
-pip install -e components/issue_tracker_client_api[dev]
-pip install -e components/trello_client_impl[dev]
 ```
 
 ### 2. Verify Installation
@@ -234,40 +226,7 @@ E2E tests require valid Trello credentials. They are automatically skipped if cr
 - Network connectivity required
 - Tests skip gracefully if credentials are missing
 
-## Pytest Configuration
-
-### Configuration Files
-
-1. **`pytest.ini`**: Main pytest configuration
-   - Test paths and naming patterns
-   - Markers definition
-   - Coverage options
-   - Output formatting
-
-2. **`pyproject.toml`**: Project-level pytest settings
-   - Python path configuration
-   - Test discovery paths
-   - Markers definition
-   - Coverage requirements
-
-3. **`.coveragerc`**: Coverage analysis configuration
-   - Source directories
-   - Branch coverage enabled
-   - Omitted paths
-   - HTML report settings
-
 ## Test Fixtures
-
-### Root Fixtures (Available in All Tests)
-
-Located in `conftest.py`:
-
-- `mock_trello_api_key()` - Mock Trello API key
-- `mock_trello_token()` - Mock Trello token
-- `mock_board_id()` - Mock board ID
-- `mock_card_data()` - Mock card API response
-- `mock_board_data()` - Mock board API response
-- `mock_member_data()` - Mock member API response
 
 ### Component-Specific Fixtures
 
@@ -369,45 +328,6 @@ pytest --lf
 
 # Run failed tests first
 pytest --ff
-```
-
-## CI/CD Integration
-
-### GitHub Actions Example
-
-```yaml
-name: Tests
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.12']
-    
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      
-      - name: Install dependencies
-        run: |
-          pip install -e .
-          pip install -e components/issue_tracker_client_api[dev]
-          pip install -e components/trello_client_impl[dev]
-      
-      - name: Run unit & integration tests
-        run: pytest -m "unit or integration" --cov=components
-      
-      - name: Run E2E tests (skipped if no credentials)
-        run: pytest -m e2e
-        env:
-          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
-          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
-          TRELLO_BOARD_ID: ${{ secrets.TRELLO_BOARD_ID }}
 ```
 
 ## Troubleshooting

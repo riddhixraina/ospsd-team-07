@@ -178,14 +178,6 @@ Quick reference guide for all test files and their contents.
 
 ## Fixture Reference
 
-### Root Fixtures ([conftest.py](conftest.py))
-- `mock_trello_api_key()` → `str`
-- `mock_trello_token()` → `str`
-- `mock_board_id()` → `str`
-- `mock_card_data()` → `dict`
-- `mock_board_data()` → `dict`
-- `mock_member_data()` → `dict`
-
 ### API Component Fixtures ([components/issue_tracker_client_api/tests/conftest.py](components/issue_tracker_client_api/tests/conftest.py))
 - `sample_board_data()` → `dict`
 - `sample_issue_data()` → `dict`
@@ -207,30 +199,6 @@ Quick reference guide for all test files and their contents.
 ### E2E Fixtures ([tests/e2e/conftest.py](tests/e2e/conftest.py))
 - `e2e_skip_if_no_credentials()` → Fixture that skips if credentials missing
 - `e2e_client_config()` → `dict` with credentials
-
----
-
-## Running Specific Tests
-
-```bash
-# Run all unit tests
-pytest -m unit
-
-# Run specific test class
-pytest components/issue_tracker_client_api/tests/client_tests.py::TestClientAbstractClass -v
-
-# Run specific test
-pytest components/issue_tracker_client_api/tests/client_tests.py::TestClientAbstractClass::test_client_is_abstract -v
-
-# Run all integration tests
-pytest -m integration
-
-# Run all e2e tests (skipped if no credentials)
-pytest -m e2e
-
-# Run all tests with coverage
-pytest --cov=components --cov-report=term-missing
-```
 
 ---
 
