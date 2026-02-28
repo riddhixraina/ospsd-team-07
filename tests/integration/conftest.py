@@ -1,18 +1,20 @@
 """Conftest for integration tests."""
 
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
+from pytest_mock import MockerFixture
 
 
 @pytest.fixture
-def mock_requests_integration(mocker):
+def mock_requests_integration(mocker: MockerFixture) -> Any:
     """Provide a mock requests module for integration tests."""
     return mocker.patch("requests.request")
 
 
 @pytest.fixture
-def integration_env_setup(mocker):
+def integration_env_setup(mocker: MockerFixture) -> Any:
     """Setup environment for integration tests with mocked credentials."""
     return mocker.patch.dict(
         "os.environ",
@@ -25,7 +27,7 @@ def integration_env_setup(mocker):
 
 
 @pytest.fixture
-def mock_client_implementation():
+def mock_client_implementation() -> MagicMock:
     """Provide a mock client implementation for integration tests."""
     mock_client = MagicMock()
     mock_client.get_issue = MagicMock()
@@ -40,7 +42,7 @@ def mock_client_implementation():
 
 
 @pytest.fixture
-def mock_card_response() -> dict:
+def mock_card_response() -> dict[str, Any]:
     """Provide a mock Trello card API response for integration tests."""
     return {
         "id": "test_card_id",
@@ -54,7 +56,7 @@ def mock_card_response() -> dict:
 
 
 @pytest.fixture
-def mock_board_response() -> dict:
+def mock_board_response() -> dict[str, Any]:
     """Provide a mock Trello board API response for integration tests."""
     return {
         "id": "test_board_id",
@@ -63,7 +65,7 @@ def mock_board_response() -> dict:
 
 
 @pytest.fixture
-def mock_member_response() -> dict:
+def mock_member_response() -> dict[str, Any]:
     """Provide a mock Trello member API response for integration tests."""
     return {
         "id": "test_member_id",

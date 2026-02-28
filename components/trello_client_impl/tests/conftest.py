@@ -1,16 +1,19 @@
 """Conftest for trello_client_impl tests."""
 
+from typing import Any
+
 import pytest
+from pytest_mock import MockerFixture
 
 
 @pytest.fixture
-def mock_requests(mocker):
+def mock_requests(mocker: MockerFixture) -> Any:
     """Provide a mock requests module."""
     return mocker.patch("trello_client_impl.trello_impl.requests")
 
 
 @pytest.fixture
-def mock_os_environ(mocker):
+def mock_os_environ(mocker: MockerFixture) -> Any:
     """Provide mocked os.environ."""
     return mocker.patch.dict(
         "os.environ",
@@ -23,7 +26,7 @@ def mock_os_environ(mocker):
 
 
 @pytest.fixture
-def trello_client_data():
+def trello_client_data() -> dict[str, str]:
     """Provide fixture data for Trello client testing."""
     return {
         "api_key": "test_api_key",
@@ -36,7 +39,7 @@ def trello_client_data():
 
 
 @pytest.fixture
-def mock_card_response():
+def mock_card_response() -> dict[str, Any]:
     """Provide a mock Trello card API response."""
     return {
         "id": "test_card_id",
@@ -50,7 +53,7 @@ def mock_card_response():
 
 
 @pytest.fixture
-def mock_board_response():
+def mock_board_response() -> dict[str, str]:
     """Provide a mock Trello board API response."""
     return {
         "id": "test_board_id",
@@ -59,7 +62,7 @@ def mock_board_response():
 
 
 @pytest.fixture
-def mock_member_response():
+def mock_member_response() -> dict[str, Any]:
     """Provide a mock Trello member API response."""
     return {
         "id": "test_member_id",
