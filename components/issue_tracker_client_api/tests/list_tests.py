@@ -43,9 +43,7 @@ class TestListAbstractClass:
         class ConcreteList(List):
             """Concrete implementation of List for testing."""
 
-            def __init__(
-                self, id: str, name: str, *, board_id: str = ""
-            ) -> None:
+            def __init__(self, id: str, name: str, *, board_id: str = "") -> None:
                 self._id = id
                 self._name = name
                 self._board_id = board_id

@@ -225,7 +225,9 @@ class TestTrelloClient:
         assert board.name == mock_board_response["name"]
         assert mock_request.call_args[0][0] == "POST"
         assert "boards" in str(mock_request.call_args[0][1])
-        assert mock_request.call_args.kwargs.get("params", {}).get("name") == "New Board"
+        assert (
+            mock_request.call_args.kwargs.get("params", {}).get("name") == "New Board"
+        )
 
     def test_trello_client_add_member_to_board(
         self,
@@ -333,9 +335,7 @@ class TestTrelloClient:
             "trello_client_impl.client.requests.request",
             return_value=mock_response,
         )
-        issues = list(
-            client_with_creds.get_issues_in_list("list_123", max_issues=10)
-        )
+        issues = list(client_with_creds.get_issues_in_list("list_123", max_issues=10))
         assert len(issues) == 1
         assert issues[0].id == mock_issue_response["id"]
         assert issues[0].list_id == mock_issue_response.get("idList", "")
@@ -370,6 +370,7 @@ class TestTrelloClient:
 
         members = client_with_creds.get_members_on_issue("issue_id")
         assert isinstance(members, list)
+
 
 @pytest.mark.unit
 class TestGetClientImpl:

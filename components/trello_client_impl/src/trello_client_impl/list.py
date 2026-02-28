@@ -9,7 +9,7 @@ class _TrelloListResponse(TypedDict, total=False):
     id: str
     name: str
     idBoard: str
-    url : str
+    url: str
 
 
 class TrelloList(ListContract):

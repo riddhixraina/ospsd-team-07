@@ -93,6 +93,7 @@ def _patch_from_api_methods(mocker):
     The replacements strip away fields like ``idMembers`` and ``idBoard`` so
     the underlying constructors receive only the parameters they expect.
     """
+
     def card_from_api(cls, card: dict[str, Any]):
         return TrelloCard(
             id=card["id"],
