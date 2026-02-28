@@ -1,0 +1,94 @@
+@startuml Issue Tracker Client Architecture
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam packageStyle rectangle
+
+title Issue Tracker Client API - Factory Method Pattern
+
+' Client (Consumer)
+class "C Solution" as Solution {
+  main(args: String[]): void
+}
+
+' ClientFactory interface
+interface "I ClientFactory" as ClientFactory {
+  createClient(): Client
+}
+
+' Client interface
+interface "I Client" as Client {
+  get_issue(issue_id: str): Issue
+  delete_issue(issue_id: str): bool
+  mark_complete(issue_id: str): bool
+  update_status(issue_id: str, status: str): bool
+  get_issues(max_issues: int): Iterator[Issue]
+  get_board(board_id: str): Board
+  get_boards(): Iterator[Board]
+  get_members_on_card(issue_id: str): list[Member]
+  assign_issue(issue_id: str, member_id: str): bool
+}
+
+' Concrete factories
+class "C TrelloClientFactory" as TrelloClientFactory {
+  createClient(): Client
+}
+
+' Domain interfaces
+interface "I Issue" as Issue {
+  id: str
+  title: str
+  is_complete: bool
+}
+
+interface "I Board" as Board {
+  id: str
+  name: str
+}
+
+interface "I Member" as Member {
+  id: str
+  username: str | None
+  is_board_member: bool | None
+}
+
+' Concrete domain implementations
+class "C TrelloCard" as TrelloCard {
+  from_api(card: dict): TrelloCard
+}
+
+class "C TrelloBoard" as TrelloBoard {
+  from_api(board: dict): TrelloBoard
+}
+
+class "C TrelloMember" as TrelloMember {
+  from_api(member: dict): TrelloMember
+}
+
+class "C TrelloClient" as TrelloClient {
+  get_issue(issue_id: str): Issue
+  delete_issue(issue_id: str): bool
+  mark_complete(issue_id: str): bool
+  update_status(issue_id: str, status: str): bool
+  get_issues(max_issues: int): Iterator[Issue]
+  get_board(board_id: str): Board
+  get_boards(): Iterator[Board]
+  get_members_on_card(issue_id: str): list[Member]
+  assign_issue(issue_id: str, member_id: str): bool
+}
+
+' Relationships
+Solution ..> ClientFactory : uses
+ClientFactory <|.. TrelloClientFactory : implements
+TrelloClientFactory ..> TrelloClient : association
+
+Client <|.. TrelloClient : implements
+TrelloClient ..> TrelloCard : creates
+TrelloClient ..> TrelloBoard : creates
+TrelloClient ..> TrelloMember : creates
+
+Issue <|.. TrelloCard : implements
+Board <|.. TrelloBoard : implements
+Member <|.. TrelloMember : implements
+
+@enduml
