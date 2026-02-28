@@ -15,7 +15,7 @@ def sample_issue_data() -> dict:
     return {
         "id": "card_id_1",
         "title": "Sample Issue",
-        "isComplete": False,
+        "is_complete": False,
     }
 
 
@@ -25,5 +25,5 @@ def sample_member_data() -> dict:
     return {
         "id": "member_id_1",
         "username": "sample_user",
-        "confirmed": True,
+        "is_board_member": True,
     }

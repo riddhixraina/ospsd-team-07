@@ -15,44 +15,48 @@ class Client(ABC):
 
     @abstractmethod
     def get_issue(self, issue_id: str) -> Issue:
-        """Return a single issue/card by its ID (Trello: GET /cards/{id})."""
+        """Return a single issue by its ID."""
         raise NotImplementedError("Subclasses must implement get_issue")
 
     @abstractmethod
     def delete_issue(self, issue_id: str) -> bool:
-        """Delete an issue by its ID (Trello: DEL /cards/{id})."""
+        """Delete an issue by its ID."""
         raise NotImplementedError("Subclasses must implement delete_issue")
 
     @abstractmethod
     def mark_complete(self, issue_id: str) -> bool:
-        """Mark an issue as complete (Trello: PUT /cards/{id} dueComplete=true)."""
+        """Mark an issue as complete."""
         raise NotImplementedError("Subclasses must implement mark_complete")
 
     @abstractmethod
-    def get_issues(self, max_issues: int = 10) -> Iterator[Issue]:
-        """Return an iterator of issues, up to max_issues.
+    def update_status(self, issue_id: str, status: str) -> bool:
+        """Update an issue's status (e.g. 'todo', 'in_progress', 'complete')."""
+        raise NotImplementedError("Subclasses must implement update_status")
 
-        Trello: GET /boards/{id}/cards.
-        """
+    @abstractmethod
+    def get_issues(self, max_issues: int = 10) -> Iterator[Issue]:
+        """Return an iterator of issues, up to max_issues."""
         raise NotImplementedError("Subclasses must implement get_issues")
 
     @abstractmethod
     def get_board(self, board_id: str) -> Board:
-        """Return a single board by its ID (Trello: GET /boards/{id})."""
+        """Return a single board by its ID."""
         raise NotImplementedError("Subclasses must implement get_board")
 
     @abstractmethod
     def get_boards(self) -> Iterator[Board]:
-        """Return an iterator of boards for the authenticated user.
-
-        Trello: GET /members/me/boards.
-        """
+        """Return an iterator of boards for the authenticated user."""
         raise NotImplementedError("Subclasses must implement get_boards")
 
     @abstractmethod
     def get_members_on_card(self, issue_id: str) -> list[Member]:
-        """Return members assigned to the card (Trello: GET /cards/{id}/members)."""
+        """Return members assigned to the issue."""
         raise NotImplementedError("Subclasses must implement get_members_on_card")
+
+    @abstractmethod
+    def assign_issue(self, issue_id: str, member_id: str) -> bool:
+        """Assign a member to an issue."""
+        raise NotImplementedError("Subclasses must implement assign_issue")
 
 
 def get_client(*, interactive: bool = False) -> Client:

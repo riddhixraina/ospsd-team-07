@@ -14,10 +14,10 @@
 
 ### Component design
 
-- **Client (ABC):** Issue/card operations (get, delete, mark complete, list), board operations (get, list), and members-on-card.
-- **Issue (ABC):** Card/issue with required `id`, `title`, `isComplete`.
+- **Client (ABC):** Issue operations (get, delete, mark complete, update status, assign), board operations (get, list), and members-on-card.
+- **Issue (ABC):** Issue with required `id`, `title`, `is_complete`.
 - **Board (ABC):** Board with `id` and `name`.
-- **Member (ABC):** Member with `id`, `username`, and `confirmed`.
+- **Member (ABC):** Member with `id`, `username`, and `is_board_member`.
 
 ### API integration
 
@@ -54,19 +54,23 @@ class Client(ABC):
     def get_board(self, board_id: str) -> Board: ...
     def get_boards(self) -> Iterator[Board]: ...
     def get_members_on_card(self, issue_id: str) -> list[Member]: ...
+    def update_status(self, issue_id: str, status: str) -> bool: ...
+    def assign_issue(self, issue_id: str, member_id: str) -> bool: ...
 ```
 
-- **`get_issue(issue_id)`** – Return a single issue/card.
+- **`get_issue(issue_id)`** – Return a single issue.
 - **`delete_issue(issue_id)`** – Remove the issue.
-- **`mark_complete(issue_id)`** – Mark the issue complete (e.g. Trello `dueComplete`).
-- **`get_issues(max_issues)`** – Yield issues/cards, up to `max_issues`.
+- **`mark_complete(issue_id)`** – Mark the issue complete.
+- **`update_status(issue_id, status)`** – Update status (e.g. 'todo', 'in_progress', 'complete').
+- **`get_issues(max_issues)`** – Yield issues, up to `max_issues`.
 - **`get_board(board_id)`** – Return a board by ID.
 - **`get_boards()`** – Yield boards (e.g. current user’s boards).
-- **`get_members_on_card(issue_id)`** – Return members assigned to the card.
+- **`get_members_on_card(issue_id)`** – Return members assigned to the issue.
+- **`assign_issue(issue_id, member_id)`** – Assign a member to an issue.
 
 ### Issue (abstract)
 
-Required: **`id`**, **`title`**, **`isComplete`**
+Required: **`id`**, **`title`**, **`is_complete`**
 
 ### Board (abstract)
 
@@ -74,7 +78,7 @@ Required: **`id`**, **`name`**
 
 ### Member (abstract)
 
-Required: **`id`**, **`username`**, **`confirmed`**.
+Required: **`id`**, **`username`**, **`is_board_member`**.
 
 ### Factory
 

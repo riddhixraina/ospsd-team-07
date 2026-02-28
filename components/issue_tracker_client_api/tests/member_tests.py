@@ -29,10 +29,10 @@ class TestMemberAbstractClass:
         assert hasattr(Member, "username")
         assert isinstance(Member.username, property)
 
-    def test_member_has_confirmed_property(self):
-        """Test that Member has a confirmed property."""
-        assert hasattr(Member, "confirmed")
-        assert isinstance(Member.confirmed, property)
+    def test_member_has_is_board_member_property(self):
+        """Test that Member has an is_board_member property."""
+        assert hasattr(Member, "is_board_member")
+        assert isinstance(Member.is_board_member, property)
 
     def test_concrete_member_implementation(self, sample_member_data):
         """Test a concrete Member implementation."""
@@ -40,10 +40,12 @@ class TestMemberAbstractClass:
         class ConcreteMember(Member):
             """Concrete implementation of Member for testing."""
 
-            def __init__(self, id: str, username: str | None, confirmed: bool | None):
+            def __init__(
+                self, id: str, username: str | None, is_board_member: bool | None
+            ):
                 self._id = id
                 self._username = username
-                self._confirmed = confirmed
+                self._is_board_member = is_board_member
 
             @property
             def id(self) -> str:
@@ -54,17 +56,17 @@ class TestMemberAbstractClass:
                 return self._username
 
             @property
-            def confirmed(self) -> bool | None:
-                return self._confirmed
+            def is_board_member(self) -> bool | None:
+                return self._is_board_member
 
         member = ConcreteMember(
             id=sample_member_data["id"],
             username=sample_member_data["username"],
-            confirmed=sample_member_data["confirmed"],
+            is_board_member=sample_member_data["is_board_member"],
         )
         assert member.id == sample_member_data["id"]
         assert member.username == sample_member_data["username"]
-        assert member.confirmed == sample_member_data["confirmed"]
+        assert member.is_board_member == sample_member_data["is_board_member"]
 
     def test_member_with_none_properties(self):
         """Test that Member properties can be None."""
@@ -84,13 +86,13 @@ class TestMemberAbstractClass:
                 return None
 
             @property
-            def confirmed(self) -> bool | None:
+            def is_board_member(self) -> bool | None:
                 return None
 
         member = ConcreteMember(id="test_id")
         assert member.id == "test_id"
         assert member.username is None
-        assert member.confirmed is None
+        assert member.is_board_member is None
 
 
 @pytest.mark.unit

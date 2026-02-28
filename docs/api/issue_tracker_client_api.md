@@ -13,29 +13,33 @@ class Client(ABC):
     def get_issue(self, issue_id: str) -> Issue: ...
     def delete_issue(self, issue_id: str) -> bool: ...
     def mark_complete(self, issue_id: str) -> bool: ...
+    def update_status(self, issue_id: str, status: str) -> bool: ...
     def get_issues(self, max_issues: int = 10) -> Iterator[Issue]: ...
     def get_board(self, board_id: str) -> Board: ...
     def get_boards(self) -> Iterator[Board]: ...
     def get_members_on_card(self, issue_id: str) -> list[Member]: ...
+    def assign_issue(self, issue_id: str, member_id: str) -> bool: ...
 ```
 
 | Method | Description |
 |--------|-------------|
-| `get_issue(issue_id)` | Return a single issue/card by ID |
+| `get_issue(issue_id)` | Return a single issue by ID |
 | `delete_issue(issue_id)` | Remove the issue |
-| `mark_complete(issue_id)` | Mark the issue complete (e.g. Trello `dueComplete`) |
-| `get_issues(max_issues)` | Yield issues/cards, up to `max_issues` |
+| `mark_complete(issue_id)` | Mark the issue complete |
+| `update_status(issue_id, status)` | Update status (e.g. 'todo', 'in_progress', 'complete') |
+| `get_issues(max_issues)` | Yield issues, up to `max_issues` |
 | `get_board(board_id)` | Return a board by ID |
-| `get_boards()` | Yield boards (e.g. current user's boards) |
-| `get_members_on_card(issue_id)` | Return members assigned to the card |
+| `get_boards()` | Yield boards for the authenticated user |
+| `get_members_on_card(issue_id)` | Return members assigned to the issue |
+| `assign_issue(issue_id, member_id)` | Assign a member to an issue |
 
 ## Data Types
 
 | Type | Required Fields |
 |------|-----------------|
-| **Issue** | `id`, `title`, `isComplete` |
+| **Issue** | `id`, `title`, `is_complete` |
 | **Board** | `id`, `name` |
-| **Member** | `id`, `username`, `confirmed` |
+| **Member** | `id`, `username`, `is_board_member` |
 
 ## Factory
 

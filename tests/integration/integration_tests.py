@@ -29,10 +29,12 @@ class TestClientInterfaceImplementation:
             "get_issue",
             "delete_issue",
             "mark_complete",
+            "update_status",
             "get_issues",
             "get_board",
             "get_boards",
             "get_members_on_card",
+            "assign_issue",
         ]
         for method in required_methods:
             assert hasattr(client, method)
@@ -45,14 +47,14 @@ class TestTrelloCardInterfaceImplementation:
 
     def test_trello_card_is_instance_of_issue(self):
         """Test that TrelloCard is an instance of Issue."""
-        card = TrelloCard(id="test_id", title="Test", isComplete=False)
+        card = TrelloCard(id="test_id", title="Test", is_complete=False)
         assert isinstance(card, Issue)
 
     def test_trello_card_implements_issue_interface(self):
         """Test that TrelloCard implements all Issue properties."""
-        card = TrelloCard(id="test_id", title="Test", isComplete=False)
+        card = TrelloCard(id="test_id", title="Test", is_complete=False)
         assert hasattr(card, "id")
-        assert hasattr(card, "dueComplete")
+        assert hasattr(card, "is_complete")
 
 
 @pytest.mark.integration
@@ -84,10 +86,12 @@ class TestTrelloMemberInterfaceImplementation:
 
     def test_trello_member_implements_member_interface(self):
         """Test that TrelloMember implements all Member properties."""
-        member = TrelloMember(id="member_id", username="testuser", confirmed=True)
+        member = TrelloMember(
+            id="member_id", username="testuser", is_board_member=True
+        )
         assert hasattr(member, "id")
         assert hasattr(member, "username")
-        assert hasattr(member, "confirmed")
+        assert hasattr(member, "is_board_member")
 
 
 @pytest.mark.integration

@@ -132,10 +132,12 @@ class TestE2EInterfaceCompliance:
             "get_issue",
             "delete_issue",
             "mark_complete",
+            "update_status",
             "get_issues",
             "get_board",
             "get_boards",
             "get_members_on_card",
+            "assign_issue",
         ]
 
         for method_name in required_methods:

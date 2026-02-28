@@ -47,7 +47,7 @@ Quick reference guide for all test files and their contents.
   - `test_issue_is_abc` - Issue inherits from ABC
   - `test_issue_has_id_property` - id property exists
   - `test_issue_has_title_property` - title property exists
-  - `test_issue_has_isComplete_property` - isComplete property exists
+  - `test_issue_has_is_complete_property` - is_complete property exists
   - `test_concrete_issue_implementation` - Test concrete implementation
 - `TestGetIssueFactory` - Factory function tests
   - `test_get_issue_not_implemented` - Factory raises NotImplementedError
@@ -66,7 +66,7 @@ Quick reference guide for all test files and their contents.
   - `test_member_is_abc` - Member inherits from ABC
   - `test_member_has_id_property` - id property exists
   - `test_member_has_username_property` - username property exists
-  - `test_member_has_confirmed_property` - confirmed property exists
+  - `test_member_has_is_board_member_property` - is_board_member property exists
   - `test_concrete_member_implementation` - Test concrete implementation
   - `test_member_with_none_properties` - Test None property values
 - `TestGetMemberFactory` - Factory function tests

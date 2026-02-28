@@ -26,10 +26,12 @@ class TestClientAbstractClass:
             "get_issue",
             "delete_issue",
             "mark_complete",
+            "update_status",
             "get_issues",
             "get_board",
             "get_boards",
             "get_members_on_card",
+            "assign_issue",
         ]
         for method_name in required_methods:
             assert hasattr(Client, method_name)
@@ -49,6 +51,9 @@ class TestClientAbstractClass:
             def mark_complete(self, issue_id: str) -> bool:
                 return True
 
+            def update_status(self, issue_id: str, status: str) -> bool:
+                return True
+
             def get_issues(self, max_issues: int = 10):
                 return iter([])
 
@@ -60,6 +65,9 @@ class TestClientAbstractClass:
 
             def get_members_on_card(self, issue_id: str) -> list[Member]:
                 return []
+
+            def assign_issue(self, issue_id: str, member_id: str) -> bool:
+                return True
 
         client = ConcreteClient()
         assert client is not None

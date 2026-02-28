@@ -40,9 +40,9 @@ client = get_client(interactive=False)
 
 | Type          | API contract        | Description                                      |
 |---------------|---------------------|--------------------------------------------------|
-| `TrelloCard`  | `Issue`             | Issue (id, title, isComplete) |
+| `TrelloCard`  | `Issue`             | Issue (id, title, is_complete) |
 | `TrelloBoard` | `Board`             | Board (id, name)       |
-| `TrelloMember`| `Member`            | Member (id, username, confirmed) |
+| `TrelloMember`| `Member`            | Member (id, username, is_board_member) |
 
 ### TrelloClient
 
@@ -51,8 +51,10 @@ Implements `issue_tracker_client_api.Client`.
 #### Issue / Card methods
 
 - **`get_issue(issue_id: str) -> Issue`** – Single card (GET /cards/{id}).
-- **`delete_issue(issue_id: str) -> bool`** – Delete card (DEL /cards/{id}).
-- **`mark_complete(issue_id: str) -> bool`** – Set card due complete (PUT /cards/{id}).
+- **`delete_issue(issue_id: str) -> bool`** – Archive then delete (PUT + DEL /cards/{id}).
+- **`mark_complete(issue_id: str) -> bool`** – Set dueComplete (PUT /cards/{id}).
+- **`update_status(issue_id, status) -> bool`** – Map status to dueComplete.
+- **`assign_issue(issue_id, member_id) -> bool`** – Add member (POST /cards/{id}/idMembers).
 - **`get_issues(max_issues: int = 10) -> Iterator[Issue]`** – Cards on board (GET /boards/{id}/cards).
 
 #### Board methods
@@ -78,7 +80,7 @@ from issue_tracker_client_api import get_client
 
 client = get_client(interactive=False)
 for issue in client.get_issues(max_issues=3):
-    print(f"{issue.id}: {issue.title} (complete={issue.isComplete})")
+    print(f"{issue.id}: {issue.title} (complete={issue.is_complete})")
 ```
 
 ### Card with Trello fields

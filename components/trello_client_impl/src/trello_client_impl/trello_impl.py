@@ -1,19 +1,39 @@
 """Trello client implementation.
 
 Concrete implementation of the issue tracker API using the Trello REST API.
-Maps Issue ↔ Card, Board ↔ Board, Member ↔ Member per Trello object definitions.
 See: https://developer.atlassian.com/cloud/trello/rest/api-group-cards/
-     https://developer.atlassian.com/cloud/trello/guides/rest-api/object-definitions/
 """
 
 import json
 import os
 from collections.abc import Iterator
-from typing import Any, cast
+from pathlib import Path
+from typing import Any, TypedDict, cast
 
 import issue_tracker_client_api
 import requests
 from issue_tracker_client_api import Board, Client, Issue, Member
+
+
+class _TrelloCardResponse(TypedDict, total=False):
+    id: str
+    name: str
+    dueComplete: bool
+    desc: str | None
+    due: str | None
+    idBoard: str | None
+    idList: str | None
+
+
+class _TrelloBoardResponse(TypedDict, total=False):
+    id: str
+    name: str
+
+
+class _TrelloMemberResponse(TypedDict, total=False):
+    id: str
+    username: str | None
+    confirmed: bool | None
 
 
 def _load_token() -> str | None:
@@ -21,37 +41,38 @@ def _load_token() -> str | None:
     token = os.getenv("TRELLO_TOKEN")
     if token:
         return token
-    token_path = os.path.join(os.getcwd(), "token.json")
-    if os.path.isfile(token_path):
-        with open(token_path, encoding="utf-8") as f:
-            data = json.load(f)
-            return cast("str | None", data.get("token"))
+    token_path = Path.cwd() / "token.json"
+    if token_path.is_file():
+        with token_path.open(encoding="utf-8") as f:
+            data: dict[str, Any] = json.load(f)
+            return data.get("token")
     return None
 
 
 class TrelloCard(Issue):
-    """Concrete Issue built from Trello Card API response."""
+    """Concrete Issue built from Trello Card API response.
+
+    Trello uses dueComplete for completion; we map it to is_complete.
+    """
 
     def __init__(
         self,
         *,
         id: str,
         title: str = "",
-        isComplete: bool = False,
-        dueComplete: bool = False,
+        is_complete: bool = False,
         desc: str | None = None,
         due: str | None = None,
-        idBoard: str | None = None,
-        idList: str | None = None,
+        id_board: str | None = None,
+        id_list: str | None = None,
     ) -> None:
         self._id = id
         self._title = title
-        self._isComplete = isComplete or dueComplete
-        self._dueComplete = dueComplete
+        self._is_complete = is_complete
         self._desc = desc
         self._due = due
-        self._idBoard = idBoard
-        self._idList = idList
+        self._id_board = id_board
+        self._id_list = id_list
 
     @property
     def id(self) -> str:
@@ -62,12 +83,8 @@ class TrelloCard(Issue):
         return self._title
 
     @property
-    def isComplete(self) -> bool:
-        return self._isComplete
-
-    @property
-    def dueComplete(self) -> bool:
-        return self._dueComplete
+    def is_complete(self) -> bool:
+        return self._is_complete
 
     @property
     def desc(self) -> str | None:
@@ -79,25 +96,24 @@ class TrelloCard(Issue):
 
     @property
     def id_board(self) -> str | None:
-        return self._idBoard
+        return self._id_board
 
     @property
     def id_list(self) -> str | None:
-        return self._idList
+        return self._id_list
 
     @classmethod
-    def from_api(cls, card: dict[str, Any]) -> "TrelloCard":
+    def from_api(cls, card: _TrelloCardResponse) -> "TrelloCard":
         """Build TrelloCard from Trello API card object."""
         due_complete = bool(card.get("dueComplete", False))
         return cls(
             id=card["id"],
             title=card.get("name", ""),
-            isComplete=due_complete,
-            dueComplete=due_complete,
+            is_complete=due_complete,
             desc=card.get("desc") or None,
             due=card.get("due"),
-            idBoard=card.get("idBoard"),
-            idList=card.get("idList"),
+            id_board=card.get("idBoard"),
+            id_list=card.get("idList"),
         )
 
 
@@ -122,7 +138,7 @@ class TrelloBoard(Board):
         return self._name
 
     @classmethod
-    def from_api(cls, board: dict[str, Any]) -> "TrelloBoard":
+    def from_api(cls, board: _TrelloBoardResponse) -> "TrelloBoard":
         """Build TrelloBoard from Trello API board object."""
         return cls(
             id=board["id"],
@@ -131,18 +147,21 @@ class TrelloBoard(Board):
 
 
 class TrelloMember(Member):
-    """Concrete Member built from Trello Member API response."""
+    """Concrete Member built from Trello Member API response.
+
+    Trello's 'confirmed' (email verified) maps to is_board_member.
+    """
 
     def __init__(
         self,
         *,
         id: str,
         username: str | None = None,
-        confirmed: bool | None = None,
+        is_board_member: bool | None = None,
     ) -> None:
         self._id = id
         self._username = username
-        self._confirmed = confirmed
+        self._is_board_member = is_board_member
 
     @property
     def id(self) -> str:
@@ -153,16 +172,17 @@ class TrelloMember(Member):
         return self._username
 
     @property
-    def confirmed(self) -> bool | None:
-        return self._confirmed
+    def is_board_member(self) -> bool | None:
+        return self._is_board_member
 
     @classmethod
-    def from_api(cls, member: dict[str, Any]) -> "TrelloMember":
+    def from_api(cls, member: _TrelloMemberResponse) -> "TrelloMember":
         """Build TrelloMember from Trello API member object."""
+        confirmed = member.get("confirmed") if "confirmed" in member else None
         return cls(
             id=member["id"],
             username=member.get("username"),
-            confirmed=member.get("confirmed") if "confirmed" in member else None,
+            is_board_member=confirmed,
         )
 
 
@@ -174,7 +194,7 @@ BASE = "https://api.trello.com/1"
 class TrelloClient(Client):
     """Trello-backed implementation of the issue tracker Client."""
 
-    def __init__(self, interactive: bool = False) -> None:
+    def __init__(self, *, interactive: bool = False) -> None:
         self.interactive = interactive
         self.api_key = os.getenv("TRELLO_API_KEY", "")
         self._token = _load_token()
@@ -183,9 +203,7 @@ class TrelloClient(Client):
     @property
     def token(self) -> str:
         if not self._token:
-            raise ValueError(
-                "Trello token not set. Set TRELLO_TOKEN or create token.json with a 'token' key."
-            )
+            raise ValueError("Trello token not set. Set TRELLO_TOKEN or token.json.")
         return self._token
 
     def _query(self, **kwargs: str) -> dict[str, str]:
@@ -203,7 +221,8 @@ class TrelloClient(Client):
             timeout=30,
         )
         resp.raise_for_status()
-        return cast("dict[str, Any] | list[Any]", resp.json())
+        result: dict[str, Any] | list[Any] = resp.json()
+        return result
 
     def _delete(self, path: str) -> None:
         url = f"{BASE}{path}" if path.startswith("/") else f"{BASE}/{path}"
@@ -228,11 +247,26 @@ class TrelloClient(Client):
         )
         resp.raise_for_status()
 
+    def _post(self, path: str, params: dict[str, str] | None = None) -> None:
+        url = f"{BASE}{path}" if path.startswith("/") else f"{BASE}/{path}"
+        resp = requests.request(
+            "POST",
+            url,
+            headers={"Accept": "application/json"},
+            params={**self._query(), **(params or {})},
+            timeout=30,
+        )
+        resp.raise_for_status()
+
     def get_issue(self, issue_id: str) -> Issue:
         data = self._get(f"/cards/{issue_id}")
-        return TrelloCard.from_api(cast("dict[str, Any]", data))
+        if not isinstance(data, dict):
+            raise TypeError("Expected dict from cards API")
+        return TrelloCard.from_api(cast("_TrelloCardResponse", data))
 
     def delete_issue(self, issue_id: str) -> bool:
+        # Trello requires archiving before delete
+        self._put(f"/cards/{issue_id}", payload={"closed": True})
         self._delete(f"/cards/{issue_id}")
         return True
 
@@ -240,33 +274,59 @@ class TrelloClient(Client):
         self._put(f"/cards/{issue_id}", payload={"dueComplete": True})
         return True
 
+    def update_status(self, issue_id: str, status: str) -> bool:
+        # Map provider-agnostic status to Trello: complete -> dueComplete
+        if status == "complete":
+            self._put(f"/cards/{issue_id}", payload={"dueComplete": True})
+        elif status == "in_progress":
+            self._put(f"/cards/{issue_id}", payload={"dueComplete": False})
+        # 'todo' and others: Trello has no direct equivalent, no-op
+        return True
+
     def get_issues(self, max_issues: int = 10) -> Iterator[Issue]:
         board_id = self._default_board_id
         if not board_id:
             boards = self._get("/members/me/boards")
-            if not boards:
+            if not isinstance(boards, list) or not boards:
                 return
-            board_id = cast("list[Any]", boards)[0]["id"]
-        data = cast("list[Any]", self._get(f"/boards/{board_id}/cards"))
-        count = 0
-        for card in data:
+            first: dict[str, Any] = boards[0]
+            board_id = first["id"]
+        data = self._get(f"/boards/{board_id}/cards")
+        if not isinstance(data, list):
+            return
+        for count, card in enumerate(data):
             if count >= max_issues:
                 break
-            yield TrelloCard.from_api(cast("dict[str, Any]", card))
-            count += 1
+            if isinstance(card, dict):
+                yield TrelloCard.from_api(cast("_TrelloCardResponse", card))
 
     def get_board(self, board_id: str) -> Board:
         data = self._get(f"/boards/{board_id}")
-        return TrelloBoard.from_api(cast("dict[str, Any]", data))
+        if not isinstance(data, dict):
+            raise TypeError("Expected dict from boards API")
+        return TrelloBoard.from_api(cast("_TrelloBoardResponse", data))
 
     def get_boards(self) -> Iterator[Board]:
-        data = cast("list[Any]", self._get("/members/me/boards"))
+        data = self._get("/members/me/boards")
+        if not isinstance(data, list):
+            return
         for board in data:
-            yield TrelloBoard.from_api(cast("dict[str, Any]", board))
+            if isinstance(board, dict):
+                yield TrelloBoard.from_api(cast("_TrelloBoardResponse", board))
 
     def get_members_on_card(self, issue_id: str) -> list[Member]:
-        data = cast("list[Any]", self._get(f"/cards/{issue_id}/members"))
-        return [TrelloMember.from_api(cast("dict[str, Any]", m)) for m in data]
+        data = self._get(f"/cards/{issue_id}/members")
+        if not isinstance(data, list):
+            return []
+        return [
+            TrelloMember.from_api(cast("_TrelloMemberResponse", m))
+            for m in data
+            if isinstance(m, dict)
+        ]
+
+    def assign_issue(self, issue_id: str, member_id: str) -> bool:
+        self._post(f"/cards/{issue_id}/idMembers", params={"idMember": member_id})
+        return True
 
 
 def get_client_impl(*, interactive: bool = False) -> Client:

@@ -29,10 +29,10 @@ class TestIssueAbstractClass:
         assert hasattr(Issue, "title")
         assert isinstance(Issue.title, property)
 
-    def test_issue_has_isComplete_property(self):
-        """Test that Issue has an isComplete property."""
-        assert hasattr(Issue, "isComplete")
-        assert isinstance(Issue.isComplete, property)
+    def test_issue_has_is_complete_property(self):
+        """Test that Issue has an is_complete property."""
+        assert hasattr(Issue, "is_complete")
+        assert isinstance(Issue.is_complete, property)
 
     def test_concrete_issue_implementation(self, sample_issue_data):
         """Test a concrete Issue implementation."""
@@ -40,10 +40,10 @@ class TestIssueAbstractClass:
         class ConcreteIssue(Issue):
             """Concrete implementation of Issue for testing."""
 
-            def __init__(self, id: str, title: str, isComplete: bool):
+            def __init__(self, id: str, title: str, is_complete: bool):
                 self._id = id
                 self._title = title
-                self._isComplete = isComplete
+                self._is_complete = is_complete
 
             @property
             def id(self) -> str:
@@ -54,17 +54,17 @@ class TestIssueAbstractClass:
                 return self._title
 
             @property
-            def isComplete(self) -> bool:
-                return self._isComplete
+            def is_complete(self) -> bool:
+                return self._is_complete
 
         issue = ConcreteIssue(
             id=sample_issue_data["id"],
             title=sample_issue_data["title"],
-            isComplete=sample_issue_data["isComplete"],
+            is_complete=sample_issue_data["is_complete"],
         )
         assert issue.id == sample_issue_data["id"]
         assert issue.title == sample_issue_data["title"]
-        assert issue.isComplete == sample_issue_data["isComplete"]
+        assert issue.is_complete == sample_issue_data["is_complete"]
 
 
 @pytest.mark.unit

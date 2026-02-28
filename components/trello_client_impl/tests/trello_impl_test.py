@@ -22,17 +22,15 @@ class TestTrelloCard:
         card = TrelloCard(
             id="card_123",
             title="Test Card",
-            isComplete=False,
-            dueComplete=False,
+            is_complete=False,
             desc="Test description",
             due="2026-02-15",
-            idBoard="board_123",
-            idList="list_123",
+            id_board="board_123",
+            id_list="list_123",
         )
         assert card.id == "card_123"
         assert card.title == "Test Card"
-        assert card.isComplete is False
-        assert card.dueComplete is False
+        assert card.is_complete is False
         assert card.desc == "Test description"
         assert card.due == "2026-02-15"
 
@@ -46,17 +44,15 @@ class TestTrelloCard:
         card = TrelloCard(
             id="test_id",
             title="Test",
-            isComplete=True,
-            dueComplete=True,
+            is_complete=True,
             desc="Test",
             due="2026-02-15",
-            idBoard="board_1",
-            idList="list_1",
+            id_board="board_1",
+            id_list="list_1",
         )
         assert hasattr(card, "id")
         assert hasattr(card, "title")
-        assert hasattr(card, "isComplete")
-        assert hasattr(card, "dueComplete")
+        assert hasattr(card, "is_complete")
         assert hasattr(card, "desc")
 
 
@@ -91,10 +87,12 @@ class TestTrelloMember:
 
     def test_trello_member_initialization(self):
         """Test TrelloMember can be initialized."""
-        member = TrelloMember(id="member_123", username="testuser", confirmed=True)
+        member = TrelloMember(
+            id="member_123", username="testuser", is_board_member=True
+        )
         assert member.id == "member_123"
         assert member.username == "testuser"
-        assert member.confirmed is True
+        assert member.is_board_member is True
 
     def test_trello_member_from_api(self, mock_member_response):
         """Test TrelloMember.from_api static method."""
@@ -103,10 +101,12 @@ class TestTrelloMember:
 
     def test_trello_member_optional_fields(self):
         """Test TrelloMember with optional fields."""
-        member = TrelloMember(id="member_123", username=None, confirmed=None)
+        member = TrelloMember(
+            id="member_123", username=None, is_board_member=None
+        )
         assert member.id == "member_123"
         assert member.username is None
-        assert member.confirmed is None
+        assert member.is_board_member is None
 
 
 @pytest.mark.unit
@@ -139,6 +139,23 @@ class TestTrelloClient:
         client = TrelloClient()
         assert client.token == "test_token"
 
+    def test_trello_client_token_raises_when_missing(self, mocker):
+        """Test TrelloClient.token raises ValueError when token not set."""
+        mocker.patch.dict(
+            "os.environ",
+            {"TRELLO_API_KEY": "key", "TRELLO_TOKEN": ""},
+            clear=False,
+        )
+        mocker.patch(
+            "trello_client_impl.trello_impl.Path.cwd",
+            return_value=__import__("pathlib").Path("/nonexistent"),
+        )
+        client = TrelloClient()
+        # Force _token to None (simulates no token in env or file)
+        object.__setattr__(client, "_token", None)
+        with pytest.raises(ValueError, match="token not set"):
+            _ = client.token
+
     def test_trello_client_query_method(self, mock_os_environ):
         """Test TrelloClient _query method includes credentials."""
         client = TrelloClient()
@@ -165,9 +182,9 @@ class TestTrelloClient:
         assert issue is not None
 
     def test_trello_client_delete_issue(self, client_with_env, mocker):
-        """Test TrelloClient.delete_issue with mocked API call."""
+        """Test TrelloClient.delete_issue with mocked API call (archive then delete)."""
         mock_response = MagicMock()
-        mocker.patch(
+        mock_request = mocker.patch(
             "trello_client_impl.trello_impl.requests.request",
             return_value=mock_response,
         )
@@ -178,6 +195,8 @@ class TestTrelloClient:
 
         result = client.delete_issue("card_id")
         assert result is True
+        # Should call PUT (archive) then DELETE
+        assert mock_request.call_count >= 2
 
     def test_trello_client_mark_complete(self, client_with_env, mocker):
         """Test TrelloClient.mark_complete with mocked API call."""
@@ -192,6 +211,52 @@ class TestTrelloClient:
         client._token = "test_token"
 
         result = client.mark_complete("card_id")
+        assert result is True
+
+    def test_trello_client_update_status_complete(self, client_with_env, mocker):
+        """Test TrelloClient.update_status with 'complete'."""
+        mock_response = MagicMock()
+        mock_request = mocker.patch(
+            "trello_client_impl.trello_impl.requests.request",
+            return_value=mock_response,
+        )
+
+        client = TrelloClient()
+        client.api_key = "test_key"
+        client._token = "test_token"
+
+        result = client.update_status("card_id", "complete")
+        assert result is True
+        assert mock_request.call_count >= 1
+
+    def test_trello_client_update_status_in_progress(self, client_with_env, mocker):
+        """Test TrelloClient.update_status with 'in_progress'."""
+        mock_response = MagicMock()
+        mocker.patch(
+            "trello_client_impl.trello_impl.requests.request",
+            return_value=mock_response,
+        )
+
+        client = TrelloClient()
+        client.api_key = "test_key"
+        client._token = "test_token"
+
+        result = client.update_status("card_id", "in_progress")
+        assert result is True
+
+    def test_trello_client_assign_issue(self, client_with_env, mocker):
+        """Test TrelloClient.assign_issue with mocked API call."""
+        mock_response = MagicMock()
+        mocker.patch(
+            "trello_client_impl.trello_impl.requests.request",
+            return_value=mock_response,
+        )
+
+        client = TrelloClient()
+        client.api_key = "test_key"
+        client._token = "test_token"
+
+        result = client.assign_issue("card_id", "member_id")
         assert result is True
 
     def test_trello_client_get_board(
@@ -248,6 +313,29 @@ class TestTrelloClient:
 
         issues = client.get_issues(max_issues=10)
         assert hasattr(issues, "__iter__")
+
+    def test_trello_client_get_issues_uses_boards_when_no_default_board(
+        self, client_with_env, mocker, mock_card_response
+    ):
+        """Test get_issues fetches boards when _default_board_id is not set."""
+        mock_response = MagicMock()
+        mock_response.json.side_effect = [
+            [{"id": "board_1", "name": "Board 1"}],
+            [mock_card_response],
+        ]
+        mocker.patch(
+            "trello_client_impl.trello_impl.requests.request",
+            return_value=mock_response,
+        )
+
+        client = TrelloClient()
+        client.api_key = "test_key"
+        client._token = "test_token"
+        client._default_board_id = None
+
+        issues = list(client.get_issues(max_issues=10))
+        assert len(issues) == 1
+        assert issues[0].id == mock_card_response["id"]
 
 
 @pytest.mark.unit

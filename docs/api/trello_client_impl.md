@@ -15,8 +15,10 @@ Implements `issue_tracker_client_api.Client`.
 | Method | Trello API | Description |
 |--------|------------|-------------|
 | `get_issue(issue_id: str) -> Issue` | GET /cards/{id} | Single card |
-| `delete_issue(issue_id: str) -> bool` | DEL /cards/{id} | Delete card |
-| `mark_complete(issue_id: str) -> bool` | PUT /cards/{id} | Set card due complete |
+| `delete_issue(issue_id: str) -> bool` | PUT (archive) + DEL /cards/{id} | Archive then delete |
+| `mark_complete(issue_id: str) -> bool` | PUT /cards/{id} | Set dueComplete |
+| `update_status(issue_id, status) -> bool` | PUT /cards/{id} | Map status to dueComplete |
+| `assign_issue(issue_id, member_id) -> bool` | POST /cards/{id}/idMembers | Add member to card |
 | `get_issues(max_issues: int = 10) -> Iterator[Issue]` | GET /boards/{id}/cards | Cards on board |
 
 ### Board methods
@@ -36,9 +38,9 @@ Implements `issue_tracker_client_api.Client`.
 
 | Type | API contract | Description |
 |-----|--------------|-------------|
-| `TrelloCard` | `Issue` | Issue (id, title, isComplete) |
+| `TrelloCard` | `Issue` | Issue (id, title, is_complete; maps Trello dueComplete) |
 | `TrelloBoard` | `Board` | Board (id, name) |
-| `TrelloMember` | `Member` | Member (id, username, confirmed) |
+| `TrelloMember` | `Member` | Member (id, username, is_board_member; maps Trello confirmed) |
 
 ## Factory
 
