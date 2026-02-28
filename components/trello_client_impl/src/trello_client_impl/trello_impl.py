@@ -147,10 +147,7 @@ class TrelloBoard(Board):
 
 
 class TrelloMember(Member):
-    """Concrete Member built from Trello Member API response.
-
-    Trello's 'confirmed' (email verified) maps to is_board_member.
-    """
+    """Concrete Member built from Trello Member API response."""
 
     def __init__(
         self,
@@ -178,11 +175,10 @@ class TrelloMember(Member):
     @classmethod
     def from_api(cls, member: _TrelloMemberResponse) -> "TrelloMember":
         """Build TrelloMember from Trello API member object."""
-        confirmed = member.get("confirmed") if "confirmed" in member else None
         return cls(
             id=member["id"],
             username=member.get("username"),
-            is_board_member=confirmed,
+            is_board_member=True,
         )
 
 
@@ -294,11 +290,13 @@ class TrelloClient(Client):
         data = self._get(f"/boards/{board_id}/cards")
         if not isinstance(data, list):
             return
-        for count, card in enumerate(data):
+        count = 0
+        for card in data:
             if count >= max_issues:
                 break
             if isinstance(card, dict):
                 yield TrelloCard.from_api(cast("_TrelloCardResponse", card))
+                count += 1
 
     def get_board(self, board_id: str) -> Board:
         data = self._get(f"/boards/{board_id}")
@@ -325,7 +323,7 @@ class TrelloClient(Client):
         ]
 
     def assign_issue(self, issue_id: str, member_id: str) -> bool:
-        self._post(f"/cards/{issue_id}/idMembers", params={"idMember": member_id})
+        self._post(f"/cards/{issue_id}/idMembers", params={"value": member_id})
         return True
 
 

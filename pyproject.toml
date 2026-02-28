@@ -58,12 +58,8 @@ ignore = [
   "SLF001",  # Private member access — tests may need to verify internal state
   "TRY300",  # Return inside try block — common pattern in test error handling
   "BLE001",  # Blind exception catch — tests may catch broad exceptions intentionally
-  "ANN401",  # Dynamically typed expressions (Any) — needed for mocking
-  "SLF001",  # Private member access — tests may need to verify internal state
   "E501",    # Line too long — test assertions can be verbose
   "S105",    # Hardcoded password in variable — tests use fake credentials
-  "ARG001",  # Unused function argument — pytest fixtures may appear unused
-  "ARG002",  # Unused method argument — same as above
   "S106",    # Hardcoded password in function arg — same as above
   "INP001",  # Missing __init__.py — test dirs must not have __init__.py per hw1
   "PLC0415", # Import not at top of file — tests may import inside functions
