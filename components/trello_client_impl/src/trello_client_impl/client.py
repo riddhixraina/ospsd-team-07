@@ -95,7 +95,9 @@ class TrelloClient(Client):
 
     def update_status(self, issue_id: str, status: str) -> bool:
         if status == "complete":
-            self._request("PUT", f"/cards/{issue_id}", json_payload={"dueComplete": True})
+            self._request(
+                "PUT", f"/cards/{issue_id}", json_payload={"dueComplete": True}
+            )
         elif status == "in_progress":
             self._request(
                 "PUT", f"/cards/{issue_id}", json_payload={"dueComplete": False}
