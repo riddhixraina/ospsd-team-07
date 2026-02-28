@@ -5,6 +5,7 @@ from .client import TrelloClient as TrelloClient
 from .client import get_client_impl as get_client_impl
 from .client import register as register
 from .issue import TrelloCard as TrelloCard
+from .list import TrelloList as TrelloList
 from .member import TrelloMember as TrelloMember
 
 # Dependency Injection happens at import time

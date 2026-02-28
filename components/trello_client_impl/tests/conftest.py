@@ -61,3 +61,12 @@ def mock_member_response() -> dict[str, Any]:
         "initials": "TU",
         "confirmed": True,
     }
+
+
+@pytest.fixture
+def mock_list_response() -> dict[str, Any]:
+    """Provide a mock Trello list API response."""
+    return {
+        "id": "test_list_id",
+        "name": "To Do",
+    }

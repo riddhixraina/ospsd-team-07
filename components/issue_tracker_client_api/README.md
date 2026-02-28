@@ -53,9 +53,11 @@ class Client(ABC):
     def get_issues(self, max_issues: int = 10) -> Iterator[Issue]: ...
     def get_board(self, board_id: str) -> Board: ...
     def get_boards(self) -> Iterator[Board]: ...
+    def get_lists(self, board_id: str) -> Iterator[List]: ...
     def get_members_on_card(self, issue_id: str) -> list[Member]: ...
     def update_status(self, issue_id: str, status: str) -> bool: ...
     def assign_issue(self, issue_id: str, member_id: str) -> bool: ...
+    def create_issue(self, title: str, list_id: str, *, description: str | None = None) -> Issue: ...
 ```
 
 - **`get_issue(issue_id)`** – Return a single issue.
@@ -65,14 +67,20 @@ class Client(ABC):
 - **`get_issues(max_issues)`** – Yield issues, up to `max_issues`.
 - **`get_board(board_id)`** – Return a board by ID.
 - **`get_boards()`** – Yield boards (e.g. current user’s boards).
+- **`get_lists(board_id)`** – Yield lists on the board.
 - **`get_members_on_card(issue_id)`** – Return members assigned to the issue.
 - **`assign_issue(issue_id, member_id)`** – Assign a member to an issue.
+- **`create_issue(title, list_id, description)`** – Create a new issue in the given list.
 
 ### Issue (abstract)
 
 Required: **`id`**, **`title`**, **`is_complete`**
 
 ### Board (abstract)
+
+Required: **`id`**, **`name`**
+
+### List (abstract)
 
 Required: **`id`**, **`name`**
 

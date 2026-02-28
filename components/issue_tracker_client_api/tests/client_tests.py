@@ -4,7 +4,7 @@ from abc import ABC
 from collections.abc import Iterator
 
 import pytest
-from issue_tracker_client_api import Board, Issue, Member
+from issue_tracker_client_api import Board, Issue, List, Member
 from issue_tracker_client_api.client import Client, get_client
 
 
@@ -31,8 +31,10 @@ class TestClientAbstractClass:
             "get_issues",
             "get_board",
             "get_boards",
+            "get_lists",
             "get_members_on_card",
             "assign_issue",
+            "create_issue",
         ]
         for method_name in required_methods:
             assert hasattr(Client, method_name)
@@ -64,10 +66,22 @@ class TestClientAbstractClass:
             def get_boards(self) -> Iterator[Board]:
                 return iter([])
 
+            def get_lists(self, board_id: str) -> Iterator[List]:
+                return iter([])
+
             def get_members_on_card(self, issue_id: str) -> list[Member]:
                 return []
 
             def assign_issue(self, issue_id: str, member_id: str) -> bool:
+                return True
+
+            def create_issue(
+                self,
+                title: str,
+                list_id: str,
+                *,
+                description: str | None = None,
+            ) -> Issue:
                 return True
 
         client = ConcreteClient()

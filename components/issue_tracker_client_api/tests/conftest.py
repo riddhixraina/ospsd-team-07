@@ -29,3 +29,9 @@ def sample_member_data() -> dict[str, Any]:
         "username": "sample_user",
         "is_board_member": True,
     }
+
+
+@pytest.fixture
+def sample_list_data() -> dict[str, Any]:
+    """Provide sample list data for testing."""
+    return {"id": "list_id_1", "name": "To Do"}

@@ -15,18 +15,20 @@ Implements `issue_tracker_client_api.Client`.
 | Method | Trello API | Description |
 |--------|------------|-------------|
 | `get_issue(issue_id: str) -> Issue` | GET /cards/{id} | Single card |
+| `create_issue(title, list_id, description) -> Issue` | POST /cards | Create card in list |
 | `delete_issue(issue_id: str) -> bool` | PUT (archive) + DEL /cards/{id} | Archive then delete |
 | `mark_complete(issue_id: str) -> bool` | PUT /cards/{id} | Set dueComplete |
 | `update_status(issue_id, status) -> bool` | PUT /cards/{id} | Map status to dueComplete |
 | `assign_issue(issue_id, member_id) -> bool` | POST /cards/{id}/idMembers | Add member to card |
 | `get_issues(max_issues: int = 10) -> Iterator[Issue]` | GET /boards/{id}/cards | Cards on board |
 
-### Board methods
+### Board and list methods
 
 | Method | Trello API | Description |
 |--------|------------|-------------|
 | `get_board(board_id: str) -> Board` | GET /boards/{id} | Single board |
 | `get_boards() -> Iterator[Board]` | GET /members/me/boards | Current user's boards |
+| `get_lists(board_id: str) -> Iterator[List]` | GET /boards/{id}/lists | Lists on a board |
 
 ### Member methods
 
@@ -40,6 +42,7 @@ Implements `issue_tracker_client_api.Client`.
 |-----|--------------|-------------|
 | `TrelloCard` | `Issue` | Issue (id, title, is_complete; maps Trello dueComplete) |
 | `TrelloBoard` | `Board` | Board (id, name) |
+| `TrelloList` | `List` | List (id, name) |
 | `TrelloMember` | `Member` | Member (id, username, is_board_member; maps Trello confirmed) |
 
 ## Factory

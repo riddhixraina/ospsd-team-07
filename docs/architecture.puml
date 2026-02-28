@@ -25,8 +25,10 @@ interface "I Client" as Client {
   get_issues(max_issues: int): Iterator[Issue]
   get_board(board_id: str): Board
   get_boards(): Iterator[Board]
+  get_lists(board_id: str): Iterator[List]
   get_members_on_card(issue_id: str): list[Member]
   assign_issue(issue_id: str, member_id: str): bool
+  create_issue(title: str, list_id: str, description?: str): Issue
 }
 
 ' Concrete factories
@@ -46,6 +48,11 @@ interface "I Board" as Board {
   name: str
 }
 
+interface "I List" as List {
+  id: str
+  name: str
+}
+
 interface "I Member" as Member {
   id: str
   username: str | None
@@ -61,6 +68,10 @@ class "C TrelloBoard" as TrelloBoard {
   from_api(board: dict): TrelloBoard
 }
 
+class "C TrelloList" as TrelloList {
+  from_api(list: dict): TrelloList
+}
+
 class "C TrelloMember" as TrelloMember {
   from_api(member: dict): TrelloMember
 }
@@ -73,8 +84,10 @@ class "C TrelloClient" as TrelloClient {
   get_issues(max_issues: int): Iterator[Issue]
   get_board(board_id: str): Board
   get_boards(): Iterator[Board]
+  get_lists(board_id: str): Iterator[List]
   get_members_on_card(issue_id: str): list[Member]
   assign_issue(issue_id: str, member_id: str): bool
+  create_issue(title: str, list_id: str, description?: str): Issue
 }
 
 ' Relationships
@@ -85,10 +98,12 @@ TrelloClientFactory ..> TrelloClient : association
 Client <|.. TrelloClient : implements
 TrelloClient ..> TrelloCard : creates
 TrelloClient ..> TrelloBoard : creates
+TrelloClient ..> TrelloList : creates
 TrelloClient ..> TrelloMember : creates
 
 Issue <|.. TrelloCard : implements
 Board <|.. TrelloBoard : implements
+List <|.. TrelloList : implements
 Member <|.. TrelloMember : implements
 
 @enduml

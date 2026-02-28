@@ -4,12 +4,13 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from issue_tracker_client_api import Board, Client, Issue, Member
+from issue_tracker_client_api import Board, Client, Issue, List, Member
 from pytest_mock import MockerFixture
 from trello_client_impl import (
     TrelloBoard,
     TrelloCard,
     TrelloClient,
+    TrelloList,
     TrelloMember,
     get_client_impl,
 )
@@ -39,8 +40,10 @@ class TestClientInterfaceImplementation:
             "get_issues",
             "get_board",
             "get_boards",
+            "get_lists",
             "get_members_on_card",
             "assign_issue",
+            "create_issue",
         ]
         for method in required_methods:
             assert hasattr(client, method)
@@ -79,6 +82,24 @@ class TestTrelloBoardInterfaceImplementation:
         assert hasattr(board, "name")
         assert board.id == "board_id"
         assert board.name == "Test Board"
+
+
+@pytest.mark.integration
+class TestTrelloListInterfaceImplementation:
+    """Test that TrelloList properly implements the List interface."""
+
+    def test_trello_list_is_instance_of_list(self) -> None:
+        """Test that TrelloList is an instance of List."""
+        list_obj = TrelloList(id="list_id", name="To Do")
+        assert isinstance(list_obj, List)
+
+    def test_trello_list_implements_list_interface(self) -> None:
+        """Test that TrelloList implements all List properties."""
+        list_obj = TrelloList(id="list_id", name="To Do")
+        assert hasattr(list_obj, "id")
+        assert hasattr(list_obj, "name")
+        assert list_obj.id == "list_id"
+        assert list_obj.name == "To Do"
 
 
 @pytest.mark.integration

@@ -146,8 +146,10 @@ class TestE2EInterfaceCompliance:
             "get_issues",
             "get_board",
             "get_boards",
+            "get_lists",
             "get_members_on_card",
             "assign_issue",
+            "create_issue",
         ]
 
         for method_name in required_methods:

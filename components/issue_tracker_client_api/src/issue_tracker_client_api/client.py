@@ -5,6 +5,7 @@ from collections.abc import Iterator
 
 from issue_tracker_client_api.board import Board
 from issue_tracker_client_api.issue import Issue
+from issue_tracker_client_api.list import List
 from issue_tracker_client_api.member import Member
 
 __all__ = ["Client", "get_client"]
@@ -49,6 +50,11 @@ class Client(ABC):
         raise NotImplementedError("Subclasses must implement get_boards")
 
     @abstractmethod
+    def get_lists(self, board_id: str) -> Iterator[List]:
+        """Return an iterator of lists on the board."""
+        raise NotImplementedError("Subclasses must implement get_lists")
+
+    @abstractmethod
     def get_members_on_card(self, issue_id: str) -> list[Member]:
         """Return members assigned to the issue."""
         raise NotImplementedError("Subclasses must implement get_members_on_card")
@@ -57,6 +63,17 @@ class Client(ABC):
     def assign_issue(self, issue_id: str, member_id: str) -> bool:
         """Assign a member to an issue."""
         raise NotImplementedError("Subclasses must implement assign_issue")
+
+    @abstractmethod
+    def create_issue(
+        self,
+        title: str,
+        list_id: str,
+        *,
+        description: str | None = None,
+    ) -> Issue:
+        """Create a new issue in the given list."""
+        raise NotImplementedError("Subclasses must implement create_issue")
 
 
 def get_client(*, interactive: bool = False) -> Client:

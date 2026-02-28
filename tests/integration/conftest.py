@@ -41,8 +41,11 @@ def mock_client_implementation() -> MagicMock:
     mock_client.update_status = MagicMock(return_value=True)
     mock_client.get_issues = MagicMock()
     mock_client.get_board = MagicMock()
+    mock_client.get_boards = MagicMock()
+    mock_client.get_lists = MagicMock()
     mock_client.get_members_on_card = MagicMock()
     mock_client.assign_issue = MagicMock(return_value=True)
+    mock_client.create_issue = MagicMock()
     return mock_client
 
 
@@ -78,4 +81,13 @@ def mock_member_response() -> dict[str, Any]:
         "fullName": "Test User",
         "initials": "TU",
         "confirmed": True,
+    }
+
+
+@pytest.fixture
+def mock_list_response() -> dict[str, Any]:
+    """Provide a mock Trello list API response for integration tests."""
+    return {
+        "id": "test_list_id",
+        "name": "To Do",
     }
