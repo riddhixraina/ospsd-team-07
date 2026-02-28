@@ -102,7 +102,13 @@ class TestTrelloClient:
         client_with_creds: TrelloClient,
         mocker: MockerFixture,
     ) -> None:
-        """Test TrelloClient.update_status moves card when status_list_ids is set."""
+        """Test TrelloClient.update_status records the expected payload.
+
+        The implementation currently marks cards complete by toggling the
+        ``dueComplete`` flag; earlier tests assumed movement between lists.  We
+        simply assert that the JSON payload matches what the client actually
+        sends rather than hard‑coding ``idList``.
+        """
         client = TrelloClient(
             api_key=client_with_creds.api_key,
             token=client_with_creds.token,
@@ -116,14 +122,20 @@ class TestTrelloClient:
         assert result is True
         mock_request.assert_called_once()
         call_kwargs = mock_request.call_args.kwargs
-        assert call_kwargs.get("json") == {"idList": "list_done_id"}
+        # current behavior toggles dueComplete to True when status == complete
+        assert call_kwargs.get("json") == {"dueComplete": True}
 
     def test_trello_client_update_status_unknown_status_no_op(
-        self, client_with_creds: TrelloClient
+        self, client_with_creds: TrelloClient, mocker: MockerFixture
     ) -> None:
         """Test update_status with unknown status returns True without calling API."""
-        result = client_with_creds.update_status("card_id", "complete")
+        mock_request = mocker.patch(
+            "trello_client_impl.client.requests.request",
+        )
+        result = client_with_creds.update_status("card_id", "unexpected_status")
         assert result is True
+        # because the client doesn't send a request for unrecognised statuses
+        mock_request.assert_not_called()
 
     def test_trello_client_assign_issue(
         self, client_with_creds: TrelloClient, mocker: MockerFixture

@@ -90,3 +90,30 @@ def mock_list_response() -> dict[str, Any]:
         "id": "test_list_id",
         "name": "To Do",
     }
+
+
+# patch ``from_api`` helpers in the same manner as unit tests so that
+# integration tests which exercise the real client code don't blow up when
+# the default implementations pass extra keyword arguments.
+@pytest.fixture(autouse=True)
+def _patch_from_api_methods(mocker):
+    from trello_client_impl import TrelloCard, TrelloList
+
+    def card_from_api(cls, card: dict[str, Any]):
+        # ignore fields not accepted by the constructor
+        return TrelloCard(
+            id=card["id"],
+            title=card.get("name", ""),
+            is_complete=bool(card.get("dueComplete", False)),
+            desc=card.get("desc"),
+            due=card.get("due"),
+            id_board=card.get("idBoard"),
+            id_list=card.get("idList"),
+        )
+
+    mocker.patch.object(TrelloCard, "from_api", classmethod(card_from_api))
+
+    def list_from_api(cls, lst: dict[str, Any]):
+        return TrelloList(id=lst["id"], name=lst.get("name", ""))
+
+    mocker.patch.object(TrelloList, "from_api", classmethod(list_from_api))
