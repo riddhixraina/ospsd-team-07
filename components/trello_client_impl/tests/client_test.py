@@ -21,7 +21,9 @@ class TestTrelloClient:
         """Create a TrelloClient with injected credentials."""
         return TrelloClient(**trello_credentials)
 
-    def test_trello_client_initialization(self, trello_credentials: dict[str, str]) -> None:
+    def test_trello_client_initialization(
+        self, trello_credentials: dict[str, str]
+    ) -> None:
         """Test TrelloClient can be initialized with credentials."""
         client = TrelloClient(**trello_credentials)
         assert client is not None
@@ -53,7 +55,9 @@ class TestTrelloClient:
         with pytest.raises(ValueError, match="api_key and token are required"):
             TrelloClient(api_key="key", token="")
 
-    def test_trello_client_query_method(self, trello_credentials: dict[str, str]) -> None:
+    def test_trello_client_query_method(
+        self, trello_credentials: dict[str, str]
+    ) -> None:
         """Test TrelloClient _query method includes credentials."""
         client = TrelloClient(**trello_credentials)
         query = client._query()
