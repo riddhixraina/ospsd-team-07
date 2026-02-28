@@ -9,6 +9,7 @@ class _TrelloMemberResponse(TypedDict, total=False):
     id: str
     username: str | None
     confirmed: bool | None
+    url: str | None
 
 
 class TrelloMember(Member):

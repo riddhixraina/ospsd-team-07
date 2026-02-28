@@ -8,6 +8,8 @@ from issue_tracker_client_api import List as ListContract
 class _TrelloListResponse(TypedDict, total=False):
     id: str
     name: str
+    idBoard: str
+    url : str
 
 
 class TrelloList(ListContract):
@@ -31,4 +33,5 @@ class TrelloList(ListContract):
         return cls(
             id=list_obj["id"],
             name=list_obj.get("name", ""),
+            idBoard=list_obj.get("idBoard", ""),
         )

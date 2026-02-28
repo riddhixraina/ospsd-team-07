@@ -8,6 +8,7 @@ from issue_tracker_client_api import Board
 class _TrelloBoardResponse(TypedDict, total=False):
     id: str
     name: str
+    url: str
 
 
 class TrelloBoard(Board):

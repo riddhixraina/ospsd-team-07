@@ -1,3 +1,5 @@
+/Users/saakshinarayan/ospsd/components/trello_client_impl/src/trello_client_impl/client.py
+
 """Client implementation.
 
 Concrete implementation of the issue tracker API using the Trello REST API.
@@ -5,16 +7,16 @@ See: https://developer.atlassian.com/cloud/trello/rest/api-group-cards/
 """
 
 from collections.abc import Iterator
-from typing import Any, cast
+from typing import Any
 
 import issue_tracker_client_api
 import requests
 from issue_tracker_client_api import Board, Client, Issue, List, Member
 
-from .board import TrelloBoard, _TrelloBoardResponse
-from .issue import TrelloCard, _TrelloCardResponse
-from .list import TrelloList, _TrelloListResponse
-from .member import TrelloMember, _TrelloMemberResponse
+from .board import TrelloBoard
+from .issue import TrelloCard
+from .list import TrelloList
+from .member import TrelloMember
 
 BASE_URL = "https://api.trello.com/1"
 
@@ -33,7 +35,6 @@ class TrelloClient(Client):
         api_key: str,
         token: str,
         board_id: str | None = None,
-        status_list_ids: dict[str, str] | None = None,
         interactive: bool = False,
     ) -> None:
         """Initialize TrelloClient with injected credentials.
@@ -42,9 +43,6 @@ class TrelloClient(Client):
             api_key: Trello API key
             token: Trello token
             board_id: Optional default board ID
-            status_list_ids: Optional mapping of status name to list ID for
-                update_status (e.g. {"todo": "id1", "in_progress": "id2", "complete": "id3"}).
-                When set, update_status moves the card to the list for that status.
             interactive: Whether to enable interactive mode
 
         """
@@ -53,7 +51,6 @@ class TrelloClient(Client):
         self.api_key = api_key
         self._token = token
         self._default_board_id = board_id
-        self._status_list_ids = status_list_ids or {}
         self.interactive = interactive
 
     @property
@@ -87,18 +84,27 @@ class TrelloClient(Client):
         data = self._request("GET", f"/cards/{issue_id}")
         if not isinstance(data, dict):
             raise TypeError("Expected dict from cards API")
-        return TrelloCard.from_api(cast("_TrelloCardResponse", data))
+        # data already conforms to _TrelloCardResponse shape; pass directly
+        return TrelloCard.from_api(data)  # type: ignore[arg-type]
 
     def delete_issue(self, issue_id: str) -> bool:
         self._request("PUT", f"/cards/{issue_id}", json_payload={"closed": True})
         self._request("DELETE", f"/cards/{issue_id}")
         return True
 
+    def mark_complete(self, issue_id: str) -> bool:
+        self._request("PUT", f"/cards/{issue_id}", json_payload={"dueComplete": True})
+        return True
+
     def update_status(self, issue_id: str, status: str) -> bool:
-        """Move the card to the list designated for the given status."""
-        list_id = self._status_list_ids.get(status)
-        if list_id is not None:
-            self._request("PUT", f"/cards/{issue_id}", json_payload={"idList": list_id})
+        if status == "complete":
+            self._request(
+                "PUT", f"/cards/{issue_id}", json_payload={"dueComplete": True}
+            )
+        elif status == "in_progress":
+            self._request(
+                "PUT", f"/cards/{issue_id}", json_payload={"dueComplete": False}
+            )
         return True
 
     def get_issues(self, max_issues: int = 10) -> Iterator[Issue]:
@@ -116,13 +122,13 @@ class TrelloClient(Client):
             if count >= max_issues:
                 break
             if isinstance(card, dict):
-                yield TrelloCard.from_api(cast("_TrelloCardResponse", card))
+                yield TrelloCard.from_api(card)  # type: ignore[arg-type]
 
     def get_board(self, board_id: str) -> Board:
         data = self._request("GET", f"/boards/{board_id}")
         if not isinstance(data, dict):
             raise TypeError("Expected dict from boards API")
-        return TrelloBoard.from_api(cast("_TrelloBoardResponse", data))
+        return TrelloBoard.from_api(data)  # type: ignore[arg-type]
 
     def get_boards(self) -> Iterator[Board]:
         data = self._request("GET", "/members/me/boards")
@@ -130,7 +136,7 @@ class TrelloClient(Client):
             return
         for board in data:
             if isinstance(board, dict):
-                yield TrelloBoard.from_api(cast("_TrelloBoardResponse", board))
+                yield TrelloBoard.from_api(board)  # type: ignore[arg-type]
 
     def get_lists(self, board_id: str) -> Iterator[List]:
         data = self._request("GET", f"/boards/{board_id}/lists")
@@ -138,14 +144,14 @@ class TrelloClient(Client):
             return
         for list_obj in data:
             if isinstance(list_obj, dict):
-                yield TrelloList.from_api(cast("_TrelloListResponse", list_obj))
+                yield TrelloList.from_api(list_obj)  # type: ignore[arg-type]
 
     def get_members_on_card(self, issue_id: str) -> list[Member]:
         data = self._request("GET", f"/cards/{issue_id}/members")
         if not isinstance(data, list):
             return []
         return [
-            TrelloMember.from_api(cast("_TrelloMemberResponse", m))
+            TrelloMember.from_api(m)  # type: ignore[arg-type]
             for m in data
             if isinstance(m, dict)
         ]
@@ -171,7 +177,7 @@ class TrelloClient(Client):
         data = self._request("POST", "/cards", params=params)
         if not isinstance(data, dict):
             raise TypeError("Expected dict from cards API")
-        return TrelloCard.from_api(cast("_TrelloCardResponse", data))
+        return TrelloCard.from_api(data)  # type: ignore[arg-type]
 
 
 def get_client_impl(**kwargs: Any) -> Client:  # noqa: ANN401
@@ -184,7 +190,6 @@ def get_client_impl(**kwargs: Any) -> Client:  # noqa: ANN401
             - api_key: Trello API key
             - token: Trello token
             - board_id (optional): Default board ID
-            - status_list_ids (optional): Map status name -> list ID for update_status
             - interactive (optional): Whether to enable interactive mode
 
     Returns:
@@ -205,7 +210,6 @@ def get_client_impl(**kwargs: Any) -> Client:  # noqa: ANN401
         api_key=api_key,
         token=token,
         board_id=kwargs.get("board_id"),
-        status_list_ids=kwargs.get("status_list_ids"),
         interactive=kwargs.get("interactive", False),
     )
 

@@ -13,6 +13,8 @@ class _TrelloCardResponse(TypedDict, total=False):
     due: str | None
     idBoard: str | None
     idList: str | None
+    idMembers: list[str]
+    url: str
 
 
 class TrelloCard(Issue):
@@ -80,4 +82,5 @@ class TrelloCard(Issue):
             due=card.get("due"),
             id_board=card.get("idBoard"),
             id_list=card.get("idList"),
+            id_members=card.get("idMembers", []),
         )
