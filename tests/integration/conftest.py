@@ -110,8 +110,6 @@ def _patch_from_api_methods(mocker):
             id=card["id"],
             title=card.get("name", ""),
             is_complete=bool(card.get("dueComplete", False)),
-            desc=card.get("desc"),
-            due=card.get("due"),
             board_id=card.get("idBoard"),
             list_id=card.get("idList") or "test_list_id",
         )

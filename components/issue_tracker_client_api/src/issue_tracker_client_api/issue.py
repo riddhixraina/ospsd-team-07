@@ -30,6 +30,12 @@ class Issue(ABC):
         """Return the ID of the list this issue belongs to."""
         raise NotImplementedError("Subclasses must implement list_id")
 
+    @property
+    @abstractmethod
+    def board_id(self) -> str | None:
+        """Return the ID of the board this issue belongs to, or None if unknown."""
+        raise NotImplementedError("Subclasses must implement board_id")
+
 
 def get_issue(issue_id: str) -> Issue:
     """Return an issue by its ID.

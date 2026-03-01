@@ -116,8 +116,9 @@ class TestTrelloClient:
         assert result is True
         mock_request.assert_called_once()
         call_kwargs = mock_request.call_args.kwargs
-        # current behavior toggles dueComplete to True when status == complete
-        assert call_kwargs.get("json") == {"dueComplete": True}
+        # status_list_ids set: move card to the list for that status.
+        # Future: when moving to the "done" list we may also set dueComplete=True so is_complete is true.
+        assert call_kwargs.get("json") == {"idList": "list_done_id"}
 
     def test_trello_client_update_status_unknown_status_no_op(
         self, client_with_creds: TrelloClient, mocker: MockerFixture
@@ -233,18 +234,17 @@ class TestTrelloClient:
         self,
         client_with_creds: TrelloClient,
         mocker: MockerFixture,
-        mock_member_response: dict[str, Any],
     ) -> None:
-        """Test TrelloClient.add_member_to_board adds member to board and returns member."""
+        """Test TrelloClient.add_member_to_board adds member to board and returns True."""
         mock_response = MagicMock()
-        mock_response.json.side_effect = [{}, mock_member_response]
+        mock_response.json.return_value = {}
         mock_request = mocker.patch(
             "trello_client_impl.client.requests.request",
             return_value=mock_response,
         )
-        member = client_with_creds.add_member_to_board("board_123", "member_456")
-        assert member.id == mock_member_response["id"]
-        assert mock_request.call_count == 2
+        result = client_with_creds.add_member_to_board("board_123", "member_456")
+        assert result is True
+        assert mock_request.call_count == 1
         put_call = mock_request.call_args_list[0]
         assert put_call[0][0] == "PUT"
         assert "boards/board_123/members/member_456" in str(put_call[0][1])

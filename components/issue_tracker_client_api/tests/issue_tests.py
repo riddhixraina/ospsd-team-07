@@ -40,6 +40,11 @@ class TestIssueAbstractClass:
         assert hasattr(Issue, "list_id")
         assert isinstance(Issue.list_id, property)
 
+    def test_issue_has_board_id_property(self) -> None:
+        """Test that Issue has a board_id property."""
+        assert hasattr(Issue, "board_id")
+        assert isinstance(Issue.board_id, property)
+
     def test_concrete_issue_implementation(
         self, sample_issue_data: dict[str, Any]
     ) -> None:
@@ -55,11 +60,13 @@ class TestIssueAbstractClass:
                 is_complete: bool,
                 *,
                 list_id: str = "",
+                board_id: str | None = None,
             ) -> None:
                 self._id = id
                 self._title = title
                 self._is_complete = is_complete
                 self._list_id = list_id
+                self._board_id = board_id
 
             @property
             def id(self) -> str:
@@ -77,16 +84,22 @@ class TestIssueAbstractClass:
             def list_id(self) -> str:
                 return self._list_id
 
+            @property
+            def board_id(self) -> str | None:
+                return self._board_id
+
         issue = ConcreteIssue(
             id=sample_issue_data["id"],
             title=sample_issue_data["title"],
             is_complete=sample_issue_data["is_complete"],
             list_id="list_1",
+            board_id="board_1",
         )
         assert issue.id == sample_issue_data["id"]
         assert issue.title == sample_issue_data["title"]
         assert issue.is_complete == sample_issue_data["is_complete"]
         assert issue.list_id == "list_1"
+        assert issue.board_id == "board_1"
 
 
 @pytest.mark.unit

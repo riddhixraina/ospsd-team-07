@@ -13,20 +13,21 @@ This document describes the system design architecture for the issue tracker cli
 | Interface | Purpose | Concrete Implementation |
 |-----------|---------|-------------------------|
 | **Client** | Contract for issue tracker operations (get issues, boards, members, update status, assign) | `TrelloClient` |
-| **Issue** | Contract for issue representation (`id`, `title`, `is_complete`) | `TrelloCard` |
-| **Board** | Contract for board representation | `TrelloBoard` |
+| **Issue** | Contract for issue representation (`id`, `title`, `is_complete`, `list_id`, `board_id`) | `TrelloCard` |
+| **Board** | Contract for board representation (`id`, `name`) | `TrelloBoard` |
+| **List** | Contract for list representation (`id`, `name`, `board_id`) | `TrelloList` |
 | **Member** | Contract for member representation (`id`, `username`, `is_board_member`) | `TrelloMember` |
 | **ClientFactory** | Contract for creating Client instances | `get_client` factory function (Trello) |
 
 ### Why These Interfaces?
 
 - **Client**: The main operations interface. Consumers depend on `Client`, not `TrelloClient`, keeping the implementation decoupled and testable.
-- **Issue, Board, Member**: Domain objects returned by `Client`. Interfaces let Trello API responses (Card, Board, Member) map to a common contract.
+- **Issue, Board, List, Member**: Domain objects returned by `Client`. Interfaces let Trello API responses (Card, Board, List, Member) map to a common contract.
 - **ClientFactory**: Decouples client creation from consumers via the `get_client()` factory function and registration.
 
 ### Classes That Do NOT Need Interfaces
 
-- **TrelloClient, TrelloCard, TrelloBoard, TrelloMember**: These are concrete implementations; they implement interfaces but are not extended by other classes.
+- **TrelloClient, TrelloCard, TrelloBoard, TrelloList, TrelloMember**: These are concrete implementations; they implement interfaces but are not extended by other classes.
 - **Helper/utility classes** (e.g., `_load_token`): Internal implementation details.
 
 ---

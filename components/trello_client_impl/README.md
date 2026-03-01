@@ -40,9 +40,9 @@ client = get_client(interactive=False)
 
 | Type          | API contract        | Description                                      |
 |---------------|---------------------|--------------------------------------------------|
-| `TrelloCard`  | `Issue`             | Issue (id, title, is_complete) |
+| `TrelloCard`  | `Issue`             | Issue (id, title, is_complete, list_id, board_id) |
 | `TrelloBoard` | `Board`             | Board (id, name)       |
-| `TrelloList`  | `List`              | List (id, name); maps to Trello lists (columns). |
+| `TrelloList`  | `List`              | List (id, name, board_id) |
 | `TrelloMember`| `Member`            | Member (id, username, is_board_member) |
 
 ### TrelloClient
@@ -62,7 +62,7 @@ Implements `issue_tracker_client_api.Client`. Constructor accepts **`status_list
 - **`get_board(board_id: str) -> Board`** – Single board (GET /boards/{id}).
 - **`get_boards() -> Iterator[Board]`** – Current user’s boards (GET /members/me/boards).
 - **`create_board(name: str) -> Board`** – Create board (POST /boards).
-- **`add_member_to_board(board_id, member_id: str) -> Member`** – Add member to board (PUT /boards/{id}/members/{idMember}), then return member (GET /members/{id}). Members are existing Trello users.
+- **`add_member_to_board(board_id, member_id: str) -> bool`** – Add member to board (PUT /boards/{id}/members/{idMember}). Members are existing Trello users. Returns True on success.
 
 #### List methods (status columns)
 

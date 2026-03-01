@@ -62,17 +62,28 @@ class TestTrelloCardInterfaceImplementation:
     def test_trello_card_is_instance_of_issue(self) -> None:
         """Test that TrelloCard is an instance of Issue."""
         card = TrelloCard(
-            id="test_id", title="Test", is_complete=False, list_id="test_list_id"
+            id="test_id",
+            title="Test",
+            is_complete=False,
+            board_id="board_1",
+            list_id="test_list_id",
         )
         assert isinstance(card, Issue)
 
     def test_trello_card_implements_issue_interface(self) -> None:
         """Test that TrelloCard implements all Issue properties."""
         card = TrelloCard(
-            id="test_id", title="Test", is_complete=False, list_id="test_list_id"
+            id="test_id",
+            title="Test",
+            is_complete=False,
+            board_id="board_1",
+            list_id="test_list_id",
         )
         assert hasattr(card, "id")
+        assert hasattr(card, "title")
         assert hasattr(card, "is_complete")
+        assert hasattr(card, "list_id")
+        assert hasattr(card, "board_id")
 
 
 @pytest.mark.integration

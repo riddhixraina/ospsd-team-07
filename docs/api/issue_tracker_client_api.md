@@ -16,7 +16,7 @@ class Client(ABC):
     def get_board(self, board_id: str) -> Board: ...
     def get_boards(self) -> Iterator[Board]: ...
     def create_board(self, name: str) -> Board: ...
-    def add_member_to_board(self, board_id: str, member_id: str) -> Member: ...
+    def add_member_to_board(self, board_id: str, member_id: str) -> bool: ...
     def get_list(self, list_id: str) -> List: ...
     def get_lists(self, board_id: str) -> Iterator[List]: ...
     def get_issues_in_list(self, list_id: str, max_issues: int = 100) -> Iterator[Issue]: ...
@@ -36,7 +36,7 @@ class Client(ABC):
 | `get_board(board_id)` | Return a board by ID |
 | `get_boards()` | Yield boards for the authenticated user |
 | `create_board(name)` | Create a new board and return it |
-| `add_member_to_board(board_id, member_id)` | Add an existing member to the board and return the member |
+| `add_member_to_board(board_id, member_id)` | Add an existing member to the board; returns True on success |
 | `get_list(list_id)` | Return a single list by ID |
 | `get_lists(board_id)` | Yield lists on the board |
 | `get_issues_in_list(list_id, max_issues)` | Yield issues in that list |
@@ -51,7 +51,7 @@ class Client(ABC):
 
 | Type | Required Fields |
 |------|-----------------|
-| **Issue** | `id`, `title`, `is_complete` |
+| **Issue** | `id`, `title`, `is_complete`, `list_id`, `board_id` |
 | **Board** | `id`, `name` |
 | **List** | `id`, `name` |
 | **Member** | `id`, `username`, `is_board_member` |

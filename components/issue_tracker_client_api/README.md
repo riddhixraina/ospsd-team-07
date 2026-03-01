@@ -15,7 +15,7 @@
 ### Component design
 
 - **Client (ABC):** Issue operations (get, delete, update status, create, assign), board operations (get, list), list CRUD (get, create, update, delete), and members-on-issue.
-- **Issue (ABC):** Issue with required `id`, `title`, `is_complete`.
+- **Issue (ABC):** Issue with required `id`, `title`, `is_complete`, `list_id`, and `board_id`.
 - **Board (ABC):** Board with `id` and `name`.
 - **Member (ABC):** Member with `id`, `username`, and `is_board_member`.
 
@@ -52,7 +52,7 @@ class Client(ABC):
     def get_board(self, board_id: str) -> Board: ...
     def get_boards(self) -> Iterator[Board]: ...
     def create_board(self, name: str) -> Board: ...
-    def add_member_to_board(self, board_id: str, member_id: str) -> Member: ...
+    def add_member_to_board(self, board_id: str, member_id: str) -> bool: ...
     def get_list(self, list_id: str) -> List: ...
     def get_lists(self, board_id: str) -> Iterator[List]: ...
     def get_issues_in_list(self, list_id: str, max_issues: int = 100) -> Iterator[Issue]: ...
@@ -71,7 +71,7 @@ class Client(ABC):
 - **`get_board(board_id)`** – Return a board by ID.
 - **`get_boards()`** – Yield boards (e.g. current user’s boards).
 - **`create_board(name)`** – Create a new board and return it.
-- **`add_member_to_board(board_id, member_id)`** – Add an existing member to the board and return the member (members are existing users; they are not created via the API).
+- **`add_member_to_board(board_id, member_id)`** – Add an existing member to the board (members are existing users; they are not created via the API). Returns True on success.
 - **`get_list(list_id)`** – Return a single list by ID.
 - **`get_lists(board_id)`** – Yield lists on the board (status columns).
 - **`get_issues_in_list(list_id, max_issues)`** – Yield issues in that list.
@@ -84,7 +84,7 @@ class Client(ABC):
 
 ### Issue (abstract)
 
-Required: **`id`**, **`title`**, **`is_complete`**, **`list_id`** (`str` – ID of the list this issue belongs to; use to group issues by list when displaying a board).
+Required: **`id`**, **`title`**, **`is_complete`**, **`list_id`** (`str`), **`board_id`** (`str` – ID of the board this issue belongs to, or None if unknown).
 
 **List-centric vs issue-centric:** Use **`get_issues_in_list(list_id)`** to fetch all issues in a list (e.g. one request per column). Each issue also has **`issue.list_id`** so you can show which list an issue belongs to when viewing a single issue (e.g. from **`get_issue()`**).
 

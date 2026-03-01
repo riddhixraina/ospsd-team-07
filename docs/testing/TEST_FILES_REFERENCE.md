@@ -48,6 +48,8 @@ Quick reference guide for all test files and their contents.
   - `test_issue_has_id_property` - id property exists
   - `test_issue_has_title_property` - title property exists
   - `test_issue_has_is_complete_property` - is_complete property exists
+  - `test_issue_has_list_id_property` - list_id property exists
+  - `test_issue_has_board_id_property` - board_id property exists
   - `test_concrete_issue_implementation` - Test concrete implementation
 - `TestGetIssueFactory` - Factory function tests
   - `test_get_issue_not_implemented` - Factory raises NotImplementedError
@@ -128,7 +130,7 @@ Quick reference guide for all test files and their contents.
 - `TestTrelloCard` - TrelloCard (Issue implementation) tests
   - `test_trello_issue_initialization` - Issue creation and properties
   - `test_trello_card_from_api` - Static factory method from API response
-  - `test_trello_card_properties` - Property access (id, title, is_complete, desc, due, id_board, id_list)
+  - `test_trello_card_properties` - Property access (id, title, is_complete, list_id, board_id)
 
 **Marked:** `@pytest.mark.unit`
 

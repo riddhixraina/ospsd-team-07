@@ -18,11 +18,13 @@ class _ConcreteIssue(Issue):
         is_complete: bool,
         *,
         list_id: str = "",
+        board_id: str | None = None,
     ) -> None:
         self._id = id
         self._title = title
         self._is_complete = is_complete
         self._list_id = list_id
+        self._board_id = board_id
 
     @property
     def id(self) -> str:
@@ -39,6 +41,10 @@ class _ConcreteIssue(Issue):
     @property
     def list_id(self) -> str:
         return self._list_id
+
+    @property
+    def board_id(self) -> str | None:
+        return self._board_id
 
 
 class _ConcreteList(List):
@@ -125,8 +131,8 @@ class _ConcreteClient(Client):
     def create_board(self, name: str) -> Board:
         return _ConcreteBoard(id="new_board", name=name)
 
-    def add_member_to_board(self, board_id: str, member_id: str) -> Member:
-        return _ConcreteMember(id=member_id, username=None, is_board_member=True)
+    def add_member_to_board(self, board_id: str, member_id: str) -> bool:
+        return True
 
     def get_list(self, list_id: str) -> List:
         return _ConcreteList(id=list_id, name="", board_id="")
@@ -162,7 +168,11 @@ class _ConcreteClient(Client):
         description: str | None = None,
     ) -> Issue:
         return _ConcreteIssue(
-            id="new_issue", title=title, is_complete=False, list_id=list_id
+            id="new_issue",
+            title=title,
+            is_complete=False,
+            list_id=list_id,
+            board_id="test_board_id",
         )
 
 

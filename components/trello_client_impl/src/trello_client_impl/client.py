@@ -95,14 +95,11 @@ class TrelloClient(Client):
         return True
 
     def update_status(self, issue_id: str, status: str) -> bool:
-        if status == "complete":
-            self._request(
-                "PUT", f"/cards/{issue_id}", json_payload={"dueComplete": True}
-            )
-        elif status == "in_progress":
-            self._request(
-                "PUT", f"/cards/{issue_id}", json_payload={"dueComplete": False}
-            )
+        list_id = self._status_list_ids.get(status)
+        if list_id is not None:
+            payload: dict[str, Any] = {"idList": list_id}
+            # Future: when status == "complete" (done list), set dueComplete=True so is_complete is true
+            self._request("PUT", f"/cards/{issue_id}", json_payload=payload)
         return True
 
     def get_board(self, board_id: str) -> Board:
@@ -126,21 +123,14 @@ class TrelloClient(Client):
             raise TypeError("Expected board response with id from boards API")
         return TrelloBoard.from_api(data)
 
-    def _get_member(self, member_id: str) -> Member:
-        """Fetch a member by ID (GET /members/{id}) and return TrelloMember."""
-        data = self._request("GET", f"/members/{member_id}")
-        if not _is_trello_member_response(data):
-            raise TypeError("Expected member response with id from members API")
-        return TrelloMember.from_api(data)
-
-    def add_member_to_board(self, board_id: str, member_id: str) -> Member:
-        """Add a member to the board (PUT /boards/{id}/members/{idMember}), then return the member."""
+    def add_member_to_board(self, board_id: str, member_id: str) -> bool:
+        """Add a member to the board (PUT /boards/{id}/members/{idMember})."""
         self._request(
             "PUT",
             f"/boards/{board_id}/members/{member_id}",
             params={"type": "normal"},
         )
-        return self._get_member(member_id)
+        return True
 
     def get_issues_in_list(
         self, list_id: str, max_issues: int = 100
