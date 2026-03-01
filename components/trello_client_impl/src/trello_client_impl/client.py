@@ -5,16 +5,16 @@ See: https://developer.atlassian.com/cloud/trello/rest/api-group-cards/
 """
 
 from collections.abc import Iterator
-from typing import Any, cast
+from typing import Any
 
 import issue_tracker_client_api
 import requests
 from issue_tracker_client_api import Board, Client, Issue, List, Member
 
-from .board import TrelloBoard
-from .issue import TrelloCard
-from .list import TrelloList, _TrelloListResponse
-from .member import TrelloMember
+from .board import TrelloBoard, _is_trello_board_response
+from .issue import TrelloCard, _is_trello_card_response
+from .list import TrelloList, _is_trello_list_response
+from .member import TrelloMember, _is_trello_member_response
 
 BASE_URL = "https://api.trello.com/1"
 
@@ -85,10 +85,9 @@ class TrelloClient(Client):
 
     def get_issue(self, issue_id: str) -> Issue:
         data = self._request("GET", f"/cards/{issue_id}")
-        if not isinstance(data, dict):
-            raise TypeError("Expected dict from cards API")
-        # data already conforms to _TrelloCardResponse shape; pass directly
-        return TrelloCard.from_api(data)  # type: ignore[arg-type]
+        if not _is_trello_card_response(data):
+            raise TypeError("Expected card response with id from cards API")
+        return TrelloCard.from_api(data)
 
     def delete_issue(self, issue_id: str) -> bool:
         self._request("PUT", f"/cards/{issue_id}", json_payload={"closed": True})
@@ -108,31 +107,31 @@ class TrelloClient(Client):
 
     def get_board(self, board_id: str) -> Board:
         data = self._request("GET", f"/boards/{board_id}")
-        if not isinstance(data, dict):
-            raise TypeError("Expected dict from boards API")
-        return TrelloBoard.from_api(data)  # type: ignore[arg-type]
+        if not _is_trello_board_response(data):
+            raise TypeError("Expected board response with id from boards API")
+        return TrelloBoard.from_api(data)
 
     def get_boards(self) -> Iterator[Board]:
         data = self._request("GET", "/members/me/boards")
         if not isinstance(data, list):
             return
         for board in data:
-            if isinstance(board, dict):
-                yield TrelloBoard.from_api(board)  # type: ignore[arg-type]
+            if _is_trello_board_response(board):
+                yield TrelloBoard.from_api(board)
 
     def create_board(self, name: str) -> Board:
         """Create a board (POST /boards)."""
         data = self._request("POST", "/boards", params={"name": name})
-        if not isinstance(data, dict):
-            raise TypeError("Expected dict from boards API")
-        return TrelloBoard.from_api(data)  # type: ignore[arg-type]
+        if not _is_trello_board_response(data):
+            raise TypeError("Expected board response with id from boards API")
+        return TrelloBoard.from_api(data)
 
     def _get_member(self, member_id: str) -> Member:
         """Fetch a member by ID (GET /members/{id}) and return TrelloMember."""
         data = self._request("GET", f"/members/{member_id}")
-        if not isinstance(data, dict):
-            raise TypeError("Expected dict from members API")
-        return TrelloMember.from_api(data)  # type: ignore[arg-type]
+        if not _is_trello_member_response(data):
+            raise TypeError("Expected member response with id from members API")
+        return TrelloMember.from_api(data)
 
     def add_member_to_board(self, board_id: str, member_id: str) -> Member:
         """Add a member to the board (PUT /boards/{id}/members/{idMember}), then return the member."""
@@ -153,22 +152,22 @@ class TrelloClient(Client):
         for count, issue in enumerate(data):
             if count >= max_issues:
                 break
-            if isinstance(issue, dict):
-                yield TrelloCard.from_api(issue)  # type: ignore[arg-type]
+            if _is_trello_card_response(issue):
+                yield TrelloCard.from_api(issue)
 
     def get_list(self, list_id: str) -> List:
         data = self._request("GET", f"/lists/{list_id}")
-        if not isinstance(data, dict):
-            raise TypeError("Expected dict from lists API")
-        return TrelloList.from_api(cast("_TrelloListResponse", data))
+        if not _is_trello_list_response(data):
+            raise TypeError("Expected list response with id from lists API")
+        return TrelloList.from_api(data)
 
     def get_lists(self, board_id: str) -> Iterator[List]:
         data = self._request("GET", f"/boards/{board_id}/lists")
         if not isinstance(data, list):
             return
         for list_obj in data:
-            if isinstance(list_obj, dict):
-                yield TrelloList.from_api(list_obj)  # type: ignore[arg-type]
+            if _is_trello_list_response(list_obj):
+                yield TrelloList.from_api(list_obj)
 
     def create_list(self, board_id: str, name: str) -> List:
         data = self._request(
@@ -176,9 +175,9 @@ class TrelloClient(Client):
             "/lists",
             params={"idBoard": board_id, "name": name},
         )
-        if not isinstance(data, dict):
-            raise TypeError("Expected dict from lists API")
-        return TrelloList.from_api(cast("_TrelloListResponse", data))
+        if not _is_trello_list_response(data):
+            raise TypeError("Expected list response with id from lists API")
+        return TrelloList.from_api(data)
 
     def update_list(self, list_id: str, name: str) -> List:
         data = self._request(
@@ -186,9 +185,9 @@ class TrelloClient(Client):
             f"/lists/{list_id}",
             json_payload={"name": name},
         )
-        if not isinstance(data, dict):
-            raise TypeError("Expected dict from lists API")
-        return TrelloList.from_api(cast("_TrelloListResponse", data))
+        if not _is_trello_list_response(data):
+            raise TypeError("Expected list response with id from lists API")
+        return TrelloList.from_api(data)
 
     def delete_list(self, list_id: str) -> bool:
         """Archive the list (Trello does not permanently delete lists)."""
@@ -199,11 +198,7 @@ class TrelloClient(Client):
         data = self._request("GET", f"/cards/{issue_id}/members")
         if not isinstance(data, list):
             return []
-        return [
-            TrelloMember.from_api(m)  # type: ignore[arg-type]
-            for m in data
-            if isinstance(m, dict)
-        ]
+        return [TrelloMember.from_api(m) for m in data if _is_trello_member_response(m)]
 
     def assign_issue(self, issue_id: str, member_id: str) -> bool:
         self._request(
@@ -224,9 +219,9 @@ class TrelloClient(Client):
         if description is not None:
             params["desc"] = description
         data = self._request("POST", "/cards", params=params)
-        if not isinstance(data, dict):
-            raise TypeError("Expected dict from cards API")
-        return TrelloCard.from_api(data)  # type: ignore[arg-type]
+        if not _is_trello_card_response(data):
+            raise TypeError("Expected card response with id from cards API")
+        return TrelloCard.from_api(data)
 
 
 def get_client_impl(**kwargs: Any) -> Client:  # noqa: ANN401

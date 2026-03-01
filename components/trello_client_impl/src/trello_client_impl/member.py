@@ -1,6 +1,6 @@
 """Implementation of the Member contract."""
 
-from typing import TypedDict
+from typing import TypedDict, TypeGuard
 
 from issue_tracker_client_api import Member
 
@@ -10,6 +10,16 @@ class _TrelloMemberResponse(TypedDict, total=False):
     username: str | None
     confirmed: bool | None
     url: str | None
+
+
+def _is_trello_member_response(obj: object) -> TypeGuard[_TrelloMemberResponse]:
+    """Type guard: narrow dict from API to Trello member response (id, username, confirmed)."""
+    return (
+        isinstance(obj, dict)
+        and "id" in obj
+        and "username" in obj
+        and "confirmed" in obj
+    )
 
 
 class TrelloMember(Member):

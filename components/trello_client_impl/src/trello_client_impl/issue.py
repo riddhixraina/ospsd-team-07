@@ -1,6 +1,6 @@
 """Implementation of the Issue contract."""
 
-from typing import TypedDict
+from typing import TypedDict, TypeGuard
 
 from issue_tracker_client_api import Issue
 
@@ -15,6 +15,11 @@ class _TrelloCardResponse(TypedDict, total=False):
     idList: str | None
     idMembers: list[str]
     url: str
+
+
+def _is_trello_card_response(obj: object) -> TypeGuard[_TrelloCardResponse]:
+    """Type guard: narrow dict from API to Trello card response shape (requires id)."""
+    return isinstance(obj, dict) and "id" in obj
 
 
 class TrelloCard(Issue):

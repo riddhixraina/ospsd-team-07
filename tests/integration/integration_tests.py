@@ -99,12 +99,12 @@ class TestTrelloListInterfaceImplementation:
 
     def test_trello_list_is_instance_of_list(self) -> None:
         """Test that TrelloList is an instance of List."""
-        list_obj = TrelloList(id="list_id", name="To Do")
+        list_obj = TrelloList(id="list_id", name="To Do", board_id="board_1")
         assert isinstance(list_obj, List)
 
     def test_trello_list_implements_list_interface(self) -> None:
         """Test that TrelloList implements all List properties."""
-        list_obj = TrelloList(id="list_id", name="To Do")
+        list_obj = TrelloList(id="list_id", name="To Do", board_id="board_1")
         assert hasattr(list_obj, "id")
         assert hasattr(list_obj, "name")
         assert list_obj.id == "list_id"
